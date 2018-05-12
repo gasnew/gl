@@ -13,7 +13,10 @@ game.entities.Player = {
   // MOVE
   moveTo: async function(tile) {
     var moveRequest = Object.create(game.Action.MoveRequest);
-    moveRequest.init(this.tile, tile);
+    moveRequest.init({
+      fromTile: this.tile,
+      toTile: tile
+    });
 
     this.applyAction(moveRequest);
     this.sendAction(moveRequest);
@@ -67,14 +70,14 @@ game.entities.Player = {
     }
   },
 
-  applyAction: async function(action) {
+  applyAction: function(action) {
     if (action.type === 'move') {
       var tile = action.content.toTile;
 
       this.x = tile.x;
       this.y = tile.y;
       this.tile = tile;
-    } else if(action.type == 'transfer') {
+    } else if(action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
 
@@ -90,7 +93,7 @@ game.entities.Player = {
       this.x = tile.x;
       this.y = tile.y;
       this.tile = tile;
-    } else if(action.type == 'transfer') {
+    } else if(action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
 
@@ -101,14 +104,14 @@ game.entities.Player = {
 
   sendAction: async function(action) {
     try {
-      var turn = await game.Net.postAction(action);
-      console.log(turn);
-      this.turn = turn;
-    } catch(turn) {
+      var turnJSON = await game.Net.postAction(action);
+      console.log(turnJSON);
+      this.turn.push(action);
+    } catch(turnJSON) {
       console.error('Action failed!');
       this.undoAction(action);
       this.rewind();
-      this.turn = turn;
+      this.turn.splice(turnJSON.length, this.turn.length);
       this.fastForward();
     }
   },

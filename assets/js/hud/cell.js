@@ -1,6 +1,5 @@
 game.hud.Cell = {
   init: function({
-    id = null,
     x = 0,
     y = 0,
     height = game.draw.TILE_SIZE,
@@ -15,7 +14,6 @@ game.hud.Cell = {
       this.content = content;
     },
   } = {}) {
-    this.id = id;
     this.x = x;
     this.y = y;
     this.height = height;

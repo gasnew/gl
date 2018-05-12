@@ -1,6 +1,8 @@
 game.Inventory.InvSlot = {
   init: function(id) {
     this.id = id;
+
+    this.type = 'InvSlot';
   },
 
   getContent: function() {
@@ -8,6 +10,9 @@ game.Inventory.InvSlot = {
   },
   setContent: function(item) {
     this.item = item;
+  },
+  empty: function() {
+    return this.getContent() == null;
   },
 };
 

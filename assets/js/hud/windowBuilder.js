@@ -27,7 +27,6 @@ game.hud.WindowBuilder = {
         let slot = inv.slots[r][c];
         let cell = Object.create(game.hud.Cell);
         cell.init({
-          id: slot.id,
           x: 0,
           y: 0,
           height: game.draw.TILE_SIZE,
@@ -40,15 +39,17 @@ game.hud.WindowBuilder = {
           },
 
           onDown: function() {
-            if (!this.empty() && game.draw.canvas.cursor.empty()) {
+            console.log(slot);
+            console.log(slot.empty());
+            if (!slot.empty() && game.draw.canvas.cursor.empty()) {
               game.entities.player.startTransfer({
-                from: this,
+                from: slot,
                 through: game.draw.canvas.cursor
               });
-            } else if (this.empty()
+            } else if (slot.empty()
               && game.entities.player.pendingTransfer()) {
               game.entities.player.completeTransfer({
-                to: this
+                to: slot,
               });
             }
           },

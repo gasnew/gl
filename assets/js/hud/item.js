@@ -1,5 +1,9 @@
 game.hud.Item = {
-  init: function(type) {
+  init: function({
+    id,
+    type,
+  }) {
+    this.id = id;
     this.type = type;
   },
 };

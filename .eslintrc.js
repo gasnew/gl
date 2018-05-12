@@ -28,6 +28,7 @@ module.exports = {
             "always"
         ],
         "no-console": "off",
+        "no-constant-condition": "off",
         "max-len": 2,
     },
     "globals": {

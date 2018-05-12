@@ -77,6 +77,25 @@ module.exports = function(sequelize, DataTypes) {
         player.x = a.content.toTile.x;
         player.y = a.content.toTile.y;
         await player.save({transaction: t});
+      } else if (a.type == 'transfer') {
+        console.log(a.content.fromContainer);
+        var item = await models.Item.find({
+          where: {id: a.content.item.id},
+          transaction: t,
+        });
+        var c2Type = 'InvSlot';
+        var c2 = await models[c2Type].find({
+          id: a.content.toContainer.id,
+          transaction: t,
+        });
+
+        // TODO Add validation here
+        // - placed in different spot?
+        // - placed within acceptable distance from player?
+        if (1 != 1)
+          throw new Error('Truth is not true');
+
+        await c2.setItem(item, {transaction: t});
       } else {
         throw new Error('No action of type ' + a.type);
       }

@@ -12,7 +12,7 @@ exports.localReg = async function (name, password) {
     where: {
       'name': name
     }
-  })
+  });
   if (null != result) {
     console.log('USERNAME ALREADY EXISTS:', result.name);
     deferred.resolve(false); // name exists
