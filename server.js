@@ -26,15 +26,17 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride('X-HTTP-Method-Override'));
-app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));
+app.use(
+  session({ secret: 'supernova', saveUninitialized: true, resave: true })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Session-persisted message middleware
-app.use(function(req, res, next){
+app.use(function(req, res, next) {
   var err = req.session.error,
-      msg = req.session.notice,
-      success = req.session.success;
+    msg = req.session.notice,
+    success = req.session.success;
 
   delete req.session.error;
   delete req.session.success;
@@ -65,12 +67,15 @@ app.use('/chunks', chunks);
 app.use('/turns', turns);
 
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) { return next(); }
-    req.session.error = 'Please sign in!';
-    res.redirect('/signin');
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  req.session.error = 'Please sign in!';
+  res.redirect('/signin');
 }
 
 // START SERVER
+console.log(app.get('port'));
 app.listen(app.get('port'));
 
 //We will be creating these two files shortly
@@ -79,58 +84,67 @@ var funct = require('./auth_funcs.js'); //funct file contains our helper functio
 //===============PASSPORT===============
 
 // Use the LocalStrategy within Passport to name/"signin" users.
- passport.use('local-signin', new LocalStrategy(
-   {passReqToCallback : true}, //allows us to pass back the request to the callback
-   function(req, name, password, done) {
-     funct.localAuth(name, password)
-     .then(function (user) {
-       if (user) {
-         console.log("LOGGED IN AS: " + user.name);
-         req.session.success = 'You are successfully logged in ' + user.name + '!';
-         done(null, user);
-       }
-       if (!user) {
-         console.log("COULD NOT LOG IN");
-         req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
-         done(null, user);
-       }
-     })
-     .fail(function (err){
-       console.log(err.body);
-     });
-   }
- ));
- // Use the LocalStrategy within Passport to register/"signup" users.
- passport.use('local-signup', new LocalStrategy(
-   {passReqToCallback : true}, //allows us to pass back the request to the callback
-   async function(req, name, password, done) {
-     console.log(name);
-     var user = await funct.localReg(name, password);
-     try {
-       if (user) {
-         console.log("REGISTERED: " + user.name);
-         req.session.success = 'You are successfully registered and logged in ' + user.name + '!';
-         done(null, user);
-       }
-       if (!user) {
-         console.log("COULD NOT REGISTER");
-         req.session.error = 'That name is already in use, please try a different one.'; //inform user could not log them in
-         done(null, user);
-       }
-     } catch(err) {
-       console.log(err.body);
-     };
-   }
- ));
+passport.use(
+  'local-signin',
+  new LocalStrategy(
+    { passReqToCallback: true }, //allows us to pass back the request to the callback
+    function(req, name, password, done) {
+      funct
+        .localAuth(name, password)
+        .then(function(user) {
+          if (user) {
+            console.log('LOGGED IN AS: ' + user.name);
+            req.session.success =
+              'You are successfully logged in ' + user.name + '!';
+            done(null, user);
+          }
+          if (!user) {
+            console.log('COULD NOT LOG IN');
+            req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
+            done(null, user);
+          }
+        })
+        .fail(function(err) {
+          console.log(err.body);
+        });
+    }
+  )
+);
+// Use the LocalStrategy within Passport to register/"signup" users.
+passport.use(
+  'local-signup',
+  new LocalStrategy(
+    { passReqToCallback: true }, //allows us to pass back the request to the callback
+    async function(req, name, password, done) {
+      console.log(name);
+      var user = await funct.localReg(name, password);
+      try {
+        if (user) {
+          console.log('REGISTERED: ' + user.name);
+          req.session.success =
+            'You are successfully registered and logged in ' + user.name + '!';
+          done(null, user);
+        }
+        if (!user) {
+          console.log('COULD NOT REGISTER');
+          req.session.error =
+            'That name is already in use, please try a different one.'; //inform user could not log them in
+          done(null, user);
+        }
+      } catch (err) {
+        console.log(err.body);
+      }
+    }
+  )
+);
 
 // Passport session setup.
 passport.serializeUser(function(user, done) {
- console.log("serializing " + user.name);
- done(null, user);
+  console.log('serializing ' + user.name);
+  done(null, user);
 });
 
 passport.deserializeUser(function(obj, done) {
-  console.log("deserializing " + obj);
+  console.log('deserializing ' + obj);
   done(null, obj);
 });
-

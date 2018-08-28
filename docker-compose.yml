@@ -1,0 +1,22 @@
+version: '2'
+services:
+  gl:
+    build: .
+    command: npm run server
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    ports:
+      - "8080:8080"
+    links:
+      - mysql:mysql
+    environment:
+      DATABASE_USER: just_a_user
+      DATABASE_PASSWORD: and_his_password
+  mysql:
+    image: mysql:5.5
+    environment:
+      MYSQL_USER: just_a_user
+      MYSQL_PASSWORD: and_his_password
+      MYSQL_DATABASE: gl
+      MYSQL_ROOT_PASSWORD: do_not_use_root_please

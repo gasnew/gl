@@ -1,9 +1,9 @@
 module.exports = {
   development: {
     username: 'root',
-    password: 'my_pass',
-    database: 'gl_test',
-    host: 'localhost',
+    password: 'do_not_use_root_please',
+    database: 'gl',
+    host: 'mysql',
     dialect: 'mysql',
 
     pool: {
