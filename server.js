@@ -75,7 +75,6 @@ function ensureAuthenticated(req, res, next) {
 }
 
 // START SERVER
-console.log(app.get('port'));
 app.listen(app.get('port'));
 
 //We will be creating these two files shortly

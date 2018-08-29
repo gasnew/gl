@@ -6,7 +6,6 @@
     "cookie-parser": "^1.4.3",
     "body-parser": "*",
     "method-override": "*",
-    "eslint": "^4.19.0",
     "express": "~4.13.4",
     "express-handlebars": "^3.0.0",
     "express-session": "*",

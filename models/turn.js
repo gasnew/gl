@@ -13,32 +13,33 @@ module.exports = function(sequelize, DataTypes) {
     Turn.hasMany(models.Action);
   };
 
-  Turn.classFuncs = function(models) {
-  };
+  Turn.classFuncs = function(models) {};
 
   Turn.protFuncs = function(models) {
     Turn.prototype.integrateAction = async function(action) {
       try {
-        var newAT = await models.sequelize.transaction();
-        var simT = await models.sequelize.transaction();
+        var newActionTransaction = await models.sequelize.transaction();
+        var simulationTransaction = await models.sequelize.transaction();
 
-        var newA = await models.Action.create(action, {transaction: newAT});
-        await this.addAction(newA, {transaction: newAT});
+        var newAction = await models.Action.create(action, {
+          transaction: newActionTransaction,
+        });
+        await this.addAction(newAction, { transaction: newActionTransaction });
 
-        await this.perform(simT, newA);
-        await simT.rollback();
-        await newAT.commit();
+        await this.perform(simulationTransaction, newAction);
+        await simulationTransaction.rollback();
+        await newActionTransaction.commit();
 
         return await this.toPostObj();
-      } catch(e) {
-        await simT.rollback();
-        await newAT.rollback();
+      } catch (e) {
+        await simulationTransaction.rollback();
+        await newActionTransaction.rollback();
 
         throw e;
       }
     };
 
-    Turn.prototype.finish = async function(force=false) {
+    Turn.prototype.finish = async function(force = false) {
       try {
         if (!force) {
           var t = await models.sequelize.transaction();
@@ -51,36 +52,34 @@ module.exports = function(sequelize, DataTypes) {
         await this.save();
 
         return await this.toPostObj();
-      } catch(e) {
+      } catch (e) {
         await t.rollback();
 
         throw e;
       }
     };
 
-    Turn.prototype.perform = async function(t, newA) {
+    Turn.prototype.perform = async function(t, newAction) {
       var actions = await this.getActions();
       for (var a of actions) {
         await this.performAction(a, t);
       }
-      if (newA)
-        await this.performAction(newA, t);
+      if (newAction) await this.performAction(newAction, t);
     };
 
     Turn.prototype.performAction = async function(a, t) {
       if (a.type == 'move') {
-        var player = await this.getPlayer({transaction: t});
+        var player = await this.getPlayer({ transaction: t });
         var dist = math.tilesTo(player, a.content.toTile);
-        if (dist !== 1)
-          throw new Error('Invalid move of distance ' + dist);
+        if (dist !== 1) throw new Error('Invalid move of distance ' + dist);
 
         player.x = a.content.toTile.x;
         player.y = a.content.toTile.y;
-        await player.save({transaction: t});
+        await player.save({ transaction: t });
       } else if (a.type == 'transfer') {
         console.log(a.content.fromContainer);
         var item = await models.Item.find({
-          where: {id: a.content.item.id},
+          where: { id: a.content.item.id },
           transaction: t,
         });
         var c2Type = 'InvSlot';
@@ -92,10 +91,9 @@ module.exports = function(sequelize, DataTypes) {
         // TODO Add validation here
         // - placed in different spot?
         // - placed within acceptable distance from player?
-        if (1 != 1)
-          throw new Error('Truth is not true');
+        if (1 != 1) throw new Error('Truth is not true');
 
-        await c2.setItem(item, {transaction: t});
+        await c2.setItem(item, { transaction: t });
       } else {
         throw new Error('No action of type ' + a.type);
       }
@@ -109,4 +107,3 @@ module.exports = function(sequelize, DataTypes) {
 
   return Turn;
 };
-

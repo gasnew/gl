@@ -1,0 +1,4 @@
+#!/bin/bash
+
+dir="$( cd "$( dirname "$BASH_SOURCE[0]}" )" && pwd )"
+docker-compose -f $dir/../docker-compose.yml up
