@@ -10,18 +10,8 @@ module.exports = function(sequelize, DataTypes) {
     },
   });
 
-  Player.protFuncs = function(models) {
-    Player.prototype.getCurrentTurn = function() {
-      return new Promise((resolve, reject) => {
-        models.Turn.findOne({where: {PlayerId: this.id, status: 'running'}}).then(turn => {
-          resolve(turn);
-        });
-      });
-    };
-  };
-
   Player.associate = function(models) {
-    Player.hasMany(models.Turn);
+    Player.hasMany(models.Phase);
     Player.belongsTo(models.User);
     Player.hasOne(models.Inventory);
   };

@@ -3,6 +3,8 @@ var models = require('../models');
 (async function() {
   await models.sequelize.sync({force: true});
 
+  await models.Phase.create({status: 'active'});
+
   const HEIGHT = 25;
   const WIDTH = 25;
 

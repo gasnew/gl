@@ -1,11 +1,11 @@
 game.entities.Player = {
-  init: function(name, x, y, tile, inventory) {
+  init: function({ name, x, y, tile, inventory }) {
     this.name = name;
     this.x = x;
     this.y = y;
     this.tile = tile;
     this.inventory = inventory;
-    this.turn = null;
+    this.pendingActions = [];
 
     return this;
   },
@@ -15,7 +15,7 @@ game.entities.Player = {
     var moveRequest = Object.create(game.Action.MoveRequest);
     moveRequest.init({
       fromTile: this.tile,
-      toTile: tile
+      toTile: tile,
     });
 
     this.applyAction(moveRequest);
@@ -25,7 +25,7 @@ game.entities.Player = {
   // TRANSFER
   transferFromContainer: null,
   transferThroughContainer: null,
-  startTransfer: function({from, through}) {
+  startTransfer: function({ from, through }) {
     through.setContent(from.getContent());
     from.setContent(null);
 
@@ -36,7 +36,7 @@ game.entities.Player = {
   pendingTransfer: function() {
     return this.transferFromContainer != null;
   },
-  completeTransfer: function({to}) {
+  completeTransfer: function({ to }) {
     var from = this.transferFromContainer;
     var through = this.transferThroughContainer;
 
@@ -48,7 +48,7 @@ game.entities.Player = {
     transferRequest.init({
       fromContainer: from,
       toContainer: to,
-      item: from.getContent()
+      item: from.getContent(),
     });
 
     this.applyAction(transferRequest);
@@ -59,13 +59,13 @@ game.entities.Player = {
   },
 
   fastForward: function() {
-    for (var action of this.turn) {
+    for (var action of this.pendingActions) {
       this.applyAction(action);
     }
   },
 
   rewind: function() {
-    for (var action of this.turn.reverse()) {
+    for (var action of this.pendingActions.reverse()) {
       this.undoAction(action);
     }
   },
@@ -77,7 +77,7 @@ game.entities.Player = {
       this.x = tile.x;
       this.y = tile.y;
       this.tile = tile;
-    } else if(action.type === 'transfer') {
+    } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
 
@@ -93,7 +93,7 @@ game.entities.Player = {
       this.x = tile.x;
       this.y = tile.y;
       this.tile = tile;
-    } else if(action.type === 'transfer') {
+    } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
 
@@ -104,10 +104,10 @@ game.entities.Player = {
 
   sendAction: async function(action) {
     try {
-      var turnJSON = await game.Net.postAction(action);
-      console.log(turnJSON);
+      var actionId = await game.Net.postAction(action);
+      console.log(actionId);
       this.turn.push(action);
-    } catch(turnJSON) {
+    } catch (turnJSON) {
       console.error('Action failed!');
       this.undoAction(action);
       this.rewind();
@@ -116,4 +116,3 @@ game.entities.Player = {
     }
   },
 };
-

@@ -3,10 +3,10 @@ game.Net.State = {
     return new Promise(async (resolve, reject) => {
       var state = {};
       var index = {
-        'Tile': {},
-        'Player': {},
-        'Item': {},
-        'InvSlot': {},
+        Tile: {},
+        Player: {},
+        Item: {},
+        InvSlot: {},
       };
 
       var chunk = await this.getChunk(index);
@@ -51,8 +51,7 @@ game.Net.State = {
     tile.init(tileData.id, x, y);
     index['Tile'][tile.id] = tile;
 
-    if (tileData.Item)
-      tile.setItem(this.makeItem(index, tileData.Item));
+    if (tileData.Item) tile.setItem(this.makeItem(index, tileData.Item));
 
     return tile;
   },
@@ -64,9 +63,12 @@ game.Net.State = {
     var y = response.y;
     var player = Object.create(game.entities.Player);
 
-    player.init(name, x, y, null, await this.getInventory(index));
-    player.turn = this.parseTurn(index, await game.Net.getTurn());
-    player.fastForward();
+    player.init({
+      name,
+      x,
+      y,
+      inventory: await this.getInventory(index),
+    });
 
     index['Player'][player.id] = player;
 
@@ -90,9 +92,9 @@ game.Net.State = {
         action = Object.create(game.Action.TransferRequest);
         console.log(from);
         action.init({
-          fromContainer: index[from.type][from.id] = from,
-          toContainer: index[to.type][to.id] = to,
-          item: index['Item'][content.item.id] = content.item,
+          fromContainer: (index[from.type][from.id] = from),
+          toContainer: (index[to.type][to.id] = to),
+          item: (index['Item'][content.item.id] = content.item),
         });
       }
 
@@ -105,18 +107,20 @@ game.Net.State = {
   getPlayers: function(index) {
     return new Promise(async (resolve, reject) => {
       var response = await game.Net.get('players/all');
-      resolve(response.map(p => {
-        var name = p.name;
-        var x = p.x;
-        var y = p.y;
-        var player = Object.create(game.entities.Player);
+      resolve(
+        response.map(p => {
+          var name = p.name;
+          var x = p.x;
+          var y = p.y;
+          var player = Object.create(game.entities.Player);
 
-        player.init(name, x, y, null);
-        index['Player'][player.id] = player;
+          player.init(name, x, y, null);
+          index['Player'][player.id] = player;
 
-        //TODO add tile to init when tile in server
-        return player;
-      }));
+          //TODO add tile to init when tile in server
+          return player;
+        })
+      );
     });
   },
 
@@ -145,8 +149,7 @@ game.Net.State = {
     var slot = Object.create(game.Inventory.InvSlot);
     slot.init(slotData.id);
     index['InvSlot'][slot.id] = slot;
-    if (slotData.Item)
-      slot.setContent(this.makeItem(index, slotData.Item));
+    if (slotData.Item) slot.setContent(this.makeItem(index, slotData.Item));
 
     return slot;
   },
@@ -155,11 +158,11 @@ game.Net.State = {
     var item = Object.create(game.hud.Item);
     item.init({
       id: data.id,
-      type: data.type
+      type: data.type,
     });
 
     index['Item'][item.id] = item;
 
     return item;
-  }
+  },
 };

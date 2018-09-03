@@ -14,7 +14,7 @@ var users = require('./routes/users.js');
 var players = require('./routes/players.js');
 var inventories = require('./routes/inventories.js');
 var chunks = require('./routes/chunks.js');
-var turns = require('./routes/turns.js');
+var phases = require('./routes/phases.js');
 
 // CONFIGURE APP
 var app = express();
@@ -64,7 +64,7 @@ app.use('/players', players);
 app.use('/inventories', inventories);
 app.use('/chunks', chunks);
 
-app.use('/turns', turns);
+app.use('/phases', phases);
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
