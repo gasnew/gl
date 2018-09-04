@@ -29,6 +29,7 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
   if (db[modelName].classFuncs) {
+    console.log(modelName);
     db[modelName].classFuncs(db);
   }
   if (db[modelName].protFuncs) {

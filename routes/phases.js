@@ -27,6 +27,18 @@ var actionWatcher = {
   },
 };
 
+router.get('/state', async function(req, res) {
+  const phase = await models.Phase.getCurrent();
+
+  res.json({
+    success: true,
+    content: {
+      snapshotIndex: phase.snapshotIndex,
+      actions: await phase.getActions(),
+    },
+  });
+});
+
 router.post('/new-action', async function(req, res) {
   try {
     var phase = await models.Phase.findOne({ where: { status: 'active' } });

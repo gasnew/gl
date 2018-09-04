@@ -6,8 +6,9 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    state: {
+    snapshotIndex: {
       type: DataTypes.JSON,
+      allowNull: false,
     },
   });
 
@@ -18,7 +19,7 @@ module.exports = function(sequelize, DataTypes) {
   Phase.protFuncs = function(models) {
     Phase.prototype.integrateAction = async function(
       action,
-      { transaction = null }
+      { transaction = null } = {}
     ) {
       try {
         var newActionTransaction =
@@ -41,7 +42,35 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     Phase.prototype.performAction = async function(action, transaction) {
-      if (action.type == 'move') {
+      if (action.type == 'createUser') {
+        const userInfo = action.content;
+        const user = await models.User.create(userInfo, {
+          transaction: transaction,
+        });
+        const player = await user.createPlayer(
+          { x: 15, y: 15 },
+          { transaction: transaction }
+        );
+        const inventory = await player.createInventory(
+          { rows: 3, cols: 5 },
+          { transaction: transaction }
+        );
+        await inventory.makeSlots(transaction);
+        await (await inventory.getAt(0, 0, transaction)).createItem(
+          {
+            type: 'berry',
+          },
+          { transaction: transaction }
+        );
+
+        action.newRecords = {
+          User: [user],
+          Player: [player],
+          Inventory: [inventory],
+          InvSlot: inventory.invSlots,
+        };
+        await action.save({ transaction: transaction });
+      } else if (action.type == 'move') {
         var player = await this.getPlayer({ transaction: transaction });
         var dist = math.tilesTo(player, action.content.toTile);
         if (dist !== 1) throw new Error('Invalid move of distance ' + dist);
@@ -71,25 +100,26 @@ module.exports = function(sequelize, DataTypes) {
         throw new Error('No action of type ' + action.type);
       }
     };
+  };
 
-    Phase.prototype.createSnapshot = async function() {
-      let modelNames = [
-        'Tile',
-        'Player',
-        'Item',
-        'InvSlot',
-      ];
-      let snapshot = {
-        form: {
-          Tile: {},
-          Player: {},
-          Item: {},
-          InvSlot: {},
-        },
-        index: await modelNames.reduce(async (index, modelName) => (
-          index[modelName] = await models[modelName].all()
-        ), {}),
-      };
+  Phase.classFuncs = function(models) {
+    Phase.getCurrent = async function() {
+      return await models.Phase.findOne({ where: { status: 'active' } });
+    };
+
+    Phase.getSnapshotIndex = async function() {
+      const modelNames = ['Tile', 'Player', 'Item', 'InvSlot'];
+      let snapshotIndex = {};
+      for (const modelName of modelNames) {
+        snapshotIndex[modelName] = await models[modelName].all().reduce(
+          (records, record) => ({
+            ...records,
+            [record.id]: record,
+          }),
+          {}
+        );
+      }
+      return snapshotIndex;
     };
   };
 

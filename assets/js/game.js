@@ -1,8 +1,8 @@
 var game = {
-  init: function (state) {
+  beginPhase: function (phase) {
     console.log(state);
-    game.chunk = state.chunk;
-    game.entities.init(game.chunk, state.entities);
+    game.chunk = phase.state.chunk;
+    game.entities.init(game.chunk, phase.state.entities);
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
     game.draw.init();
 

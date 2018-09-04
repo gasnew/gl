@@ -1,28 +1,22 @@
 game.Net.State = {
-  getServerState: function() {
-    return new Promise(async (resolve, reject) => {
-      var state = {};
-      var index = {
-        Tile: {},
-        Player: {},
-        Item: {},
-        InvSlot: {},
+  getPhaseState: function() {
+    return new Promise(async (resolve) => {
+      const serverState = await game.Net.get('phases/state');
+      console.log(serverState);
+      const index = this.digestIndex(serverState.snapshotIndex);
+      var state = {
+        index,
+        actions: this.digestActions(index, serverState.actions),
       };
-
-      var chunk = await this.getChunk(index);
-      state.chunk = chunk;
-
-      var player = await this.getPlayer(index);
-      var players = await this.getPlayers(index);
-
-      state.entities = {
-        mainPlayer: player,
-        players: players,
-      };
-      console.log(index);
 
       resolve(state);
     });
+  },
+
+  digestIndex: function(index) {
+    for (const modelName of index){
+      console.log(modelName);
+    }
   },
 
   getChunk: async function(index) {
