@@ -64,10 +64,18 @@ module.exports = function(sequelize, DataTypes) {
         );
 
         action.newRecords = {
-          User: [user],
-          Player: [player],
-          Inventory: [inventory],
-          InvSlot: inventory.invSlots,
+          User: { [user.id]: user },
+          Player: { [player.id]: player },
+          Inventory: { [inventory.id]: inventory },
+          InvSlot: (await inventory.getInvSlots({
+            transaction: transaction,
+          })).reduce(
+            (slots, slot) => ({
+              ...slots,
+              [slot.id]: slot,
+            }),
+            {}
+          ),
         };
         await action.save({ transaction: transaction });
       } else if (action.type == 'move') {
@@ -108,7 +116,14 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     Phase.getSnapshotIndex = async function() {
-      const modelNames = ['Tile', 'Player', 'Item', 'InvSlot'];
+      const modelNames = [
+        'Tile',
+        'User',
+        'Player',
+        'Item',
+        'Inventory',
+        'InvSlot',
+      ];
       let snapshotIndex = {};
       for (const modelName of modelNames) {
         snapshotIndex[modelName] = await models[modelName].all().reduce(

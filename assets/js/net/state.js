@@ -1,24 +1,12 @@
 game.Net.State = {
   getPhaseState: function() {
-    return new Promise(async (resolve) => {
-      const serverState = await game.Net.get('phases/state');
-      console.log(serverState);
-      const index = this.digestIndex(serverState.snapshotIndex);
-      var state = {
-        index,
-        actions: this.digestActions(index, serverState.actions),
-      };
+    return new Promise(async resolve => {
+      const phaseState = await game.Net.get('phases/state');
 
-      resolve(state);
+      console.log(phaseState);
+      resolve(phaseState);
     });
   },
-
-  digestIndex: function(index) {
-    for (const modelName of index){
-      console.log(modelName);
-    }
-  },
-
   getChunk: async function(index) {
     var response = await game.Net.get('chunks/main');
     var height = response.height;

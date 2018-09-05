@@ -1,4 +1,4 @@
-game.entities.Player = {
+game.Player = {
   init: function({ name, x, y, tile, inventory }) {
     this.name = name;
     this.x = x;

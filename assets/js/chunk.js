@@ -1,17 +1,6 @@
 game.Chunk = {
-  tiles: [],
-
-  init: function(tiles) {
+  init: function({ tiles }) {
     this.tiles = tiles;
-    // this.tiles = new Array(rows);
-    // 
-    // for (var i = 0; i < rows; i++) {
-    //   this.tiles[i] = Array(cols);
-    //   for (var j = 0; j < cols; j++) {
-    //     var new_b = Object.create(game.Tile);
-    //     this.tiles[i][j] = new_b.init(j, i);
-    //   }
-    // }
   },
 
   tileAt: function(row, col) {
@@ -22,4 +11,3 @@ game.Chunk = {
     return null;
   },
 };
-

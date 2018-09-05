@@ -1,7 +1,18 @@
 var game = {
-  beginPhase: function (phase) {
-    console.log(state);
-    game.chunk = phase.state.chunk;
+  beginPhase: function(phase) {
+    game.phase = phase;
+
+    const tiles = Object.values(phase.index.Tile);
+    game.chunk = game.Utils.create('Chunk', {
+      tiles: game.Utils.arrange({
+        items: tiles,
+        numRows: 25,
+        numColumns: 25,
+        getRow: tile => tile.y,
+        getColumn: tile => tile.x,
+      }),
+    });
+
     game.entities.init(game.chunk, phase.state.entities);
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
     game.draw.init();
@@ -15,7 +26,7 @@ var game = {
     if (player) {
       player.turn = res.turn;
       player.fastForward();
-      console.log(player.name + '\'s turn updated!');
+      console.log(player.name + "'s turn updated!");
     }
 
     this.subscribeTurnUpdates();
@@ -33,4 +44,3 @@ var game = {
     game.draw.hud.cursor(game.draw.canvas.cursor);
   },
 };
-
