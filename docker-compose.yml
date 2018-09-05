@@ -14,7 +14,7 @@ services:
       DATABASE_USER: just_a_user
       DATABASE_PASSWORD: and_his_password
   mysql:
-    image: mysql:8.0
+    image: mysql:5.7
     environment:
       MYSQL_USER: just_a_user
       MYSQL_PASSWORD: and_his_password

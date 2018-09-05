@@ -30,7 +30,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "server": "node app.js",
+    "server": "node_modules/.bin/nodemon server.js",
     "console": "node console.js",
     "seed": "node scripts/seed.js"
   }

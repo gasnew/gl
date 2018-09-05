@@ -1,0 +1,6 @@
+#!/bin/bash
+
+dir="$( cd "$( dirname "$BASH_SOURCE[0]}" )" && pwd )"
+docker-compose -f $dir/../docker-compose.yml rm -vf
+docker-compose -f $dir/../docker-compose.yml run --rm mysql bash -c 'mysql -uroot --password=$MYSQL_ROOT_PASSWORD -h mysql -e "GRANT ALL ON *.* TO \"${MYSQL_USER}\"@\"%\" IDENTIFIED BY \"${MYSQL_PASSWORD}\" WITH GRANT OPTION"'
+docker-compose -f $dir/../docker-compose.yml run --rm gl npm run seed
