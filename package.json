@@ -3,18 +3,19 @@
   "main": "app.js",
   "dependencies": {
     "bcryptjs": "^0.7.12",
-    "cookie-parser": "^1.4.3",
     "body-parser": "*",
-    "method-override": "*",
+    "cookie-parser": "^1.4.3",
     "express": "~4.13.4",
     "express-handlebars": "^3.0.0",
+    "express-mysql-session": "^2.0.1",
     "express-session": "*",
     "forever-monitor": "^1.7.1",
+    "method-override": "*",
     "mysql2": "^1.5.3",
     "passport": "^0.2.0",
     "passport-local": "^1.0.0",
-    "sequelize": "^4.37.5",
-    "q": "^1.0.1"
+    "q": "^1.0.1",
+    "sequelize": "^4.37.5"
   },
   "devDependencies": {
     "eslint": "^4.19.0",
@@ -26,11 +27,12 @@
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.0.1",
+    "nodemon": "^1.18.4",
     "prettier": "^1.14.2"
   },
   "scripts": {
     "lint": "eslint .",
-    "server": "node_modules/.bin/nodemon server.js",
+    "server": "./node_modules/.bin/nodemon server.js",
     "console": "node console.js",
     "seed": "node scripts/seed.js"
   }

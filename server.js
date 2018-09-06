@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var session = require('express-session');
+var MYSQLStore = require('express-mysql-session')(session);
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var path = require('path');
@@ -21,13 +22,28 @@ var app = express();
 app.set('port', 8080);
 app.use(express.static(path.join(__dirname, 'assets'), { index: false }));
 
+// SET STORE FOR SESSIONS
+const options = {
+  host: 'mysql',
+  port: 3306,
+  user: 'root',
+  password: 'do_not_use_root_please',
+  database: 'gl',
+};
+var sessionStore = new MYSQLStore(options);
+
 // SET MIDDLEWARE
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(
-  session({ secret: 'supernova', saveUninitialized: true, resave: true })
+  session({
+    secret: 'supernova',
+    saveUninitialized: false,
+    resave: true,
+    store: sessionStore,
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session());
