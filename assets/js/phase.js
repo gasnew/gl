@@ -29,7 +29,24 @@ game.Phase = {
   },
 
   connect: function(index) {
-    return index;
+    let connectedIndex = {};
+    for (let modelName of Object.keys(index)) {
+      connectedIndex[modelName] = {};
+      let records = index[modelName];
+      for (let id of Object.keys(records)) {
+        let record = records[id];
+        connectedIndex[modelName][id] = record;
+        for (let property of Object.keys(record)) {
+          if (property.endsWith('Id') && property !== 'Id') {
+            const relatedModelName = property.replace('Id', '');
+            record[relatedModelName] =
+              index[relatedModelName][record[property]];
+          }
+        }
+      }
+    }
+
+    return connectedIndex;
   },
 
   digestAndMergeIntoIndex: function(index) {
@@ -39,6 +56,7 @@ game.Phase = {
         this.index[modelName][id] = game.Utils.create(modelName, records[id]);
       }
     }
+    this.index = this.connect(this.index);
   },
 
   fastForward: function() {
@@ -57,6 +75,8 @@ game.Phase = {
     if (action.type === 'createUser') {
       console.log(action.newRecords);
       this.digestAndMergeIntoIndex(action.newRecords);
+      console.log('index');
+      console.log(this.index);
     } else if (action.type === 'move') {
       const tile = action.content.toTile;
 

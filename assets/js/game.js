@@ -13,7 +13,10 @@ var game = {
       }),
     });
 
-    game.entities.init(game.chunk, phase.state.entities);
+    game.entities.init({
+      chunk: game.chunk,
+      players: Object.values(phase.index.Player),
+    });
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
     game.draw.init();
 

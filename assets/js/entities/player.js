@@ -1,11 +1,13 @@
 game.Player = {
-  init: function({ name, x, y, tile, inventory }) {
+  init: function({ id, name, x, y, UserId }) {
+    this.id = id;
     this.name = name;
     this.x = x;
     this.y = y;
-    this.tile = tile;
-    this.inventory = inventory;
+    this.UserId = UserId;
+
     this.pendingActions = [];
+    this.Inventory = null;
 
     return this;
   },
