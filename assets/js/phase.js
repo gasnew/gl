@@ -1,13 +1,13 @@
 game.Phase = {
   index: {},
-  verifiedActions: [],
+  actions: [],
   pendingActions: [],
 
   init: function({ state }) {
     this.index = this.connectInternally(this.digestIndex(state.snapshotIndex));
     console.log(this.index);
-    this.verifiedActions = state.actions;
-    console.log(this.verifiedActions);
+    this.actions = state.actions;
+    console.log(this.actions);
     this.username = state.username;
 
     this.fastForward();
@@ -33,8 +33,7 @@ game.Phase = {
     for (let property of Object.keys(asset)) {
       if (property.endsWith('Id') && property !== 'Id') {
         const relatedModelName = property.replace('Id', '');
-        asset[relatedModelName] =
-          index[relatedModelName][asset[property]];
+        asset[relatedModelName] = index[relatedModelName][asset[property]];
       }
     }
 
@@ -48,7 +47,10 @@ game.Phase = {
       let assets = index[modelName];
       for (let id of Object.keys(assets)) {
         let asset = assets[id];
-        connectedIndex[modelName][id] = this.connect(index, asset);
+        connectedIndex[modelName][id] = this.connect(
+          index,
+          asset
+        );
       }
     }
 
@@ -66,29 +68,42 @@ game.Phase = {
       const records = recordIndex[modelName];
       for (const id of Object.keys(records)) {
         const asset = this.index[modelName][id];
-        this.index[modelName][id] = this.connect(this.index, asset);
+        this.index[modelName][id] = this.connect(
+          this.index,
+          asset
+        );
       }
     }
   },
 
-  fastForward: function() {
-    for (const action of this.verifiedActions) {
+  fastForward: function({ fromId } = {}) {
+    let actions = fromId
+      ? this.actions.filter(action => action.id >= fromId)
+      : this.actions;
+    for (const action of actions) {
       this.applyAction(action);
     }
   },
 
-  rewind: function() {
-    for (const action of this.verifiedActions.reverse()) {
+  rewind: function({ throughId } = {}) {
+    for (
+      let i = this.actions.length - 1;
+      i >= 0 && (!throughId || throughId <= this.actions[i].id);
+      i--
+    ) {
+      this.undoAction(this.actions[i]);
+    }
+  },
+
+  rewindPendingActions: function() {
+    for (const action of this.pendingActions.reverse()) {
       this.undoAction(action);
     }
   },
 
   applyAction: function(action) {
     if (action.type === 'createUser') {
-      console.log(action.newRecords);
       this.digestAndMergeIntoIndex(action.newRecords);
-      console.log('index');
-      console.log(this.index);
     } else if (action.type === 'move') {
       const tile = this.deserialize(action.content.toTile);
       const player = this.index.Player[action.PlayerId];
@@ -124,18 +139,40 @@ game.Phase = {
     }
   },
 
+  insertAction: function(actionToInsert) {
+    let throughId = null;
+    for (
+      let i = this.actions.length - 1;
+      i >= 0 && actionToInsert.id < this.actions[i].id;
+      i--
+    ) {
+      throughId = this.actions[i].id;
+    }
+    this.undoAction(actionToInsert);
+    let laterActions = [];
+    if (throughId) {
+      this.rewind({ throughId });
+      laterActions = this.actions.splice(this.actions.indexOf(throughId));
+    }
+    this.actions.push(actionToInsert);
+    this.actions = this.actions.concat(laterActions);
+    this.fastForward({ fromId: actionToInsert.id });
+  },
+
   sendAction: async function(action) {
     try {
-      var actionId = await game.Net.postAction(action);
-      console.log(actionId);
       this.pendingActions.push(action);
+      var response = await game.Net.postAction(action);
+      this.pendingActions.shift();
+      action.id = response.actionId;
+      this.insertAction(action);
+      console.log(action);
+      console.log(this.actions);
     } catch (error) {
       console.error('Action failed!');
       console.error(error);
-      this.undoAction(action);
-      this.rewind();
-      this.pendingActions.splice(this.pendingActions.indexOf(action));
-      this.fastForward();
+      this.rewindPendingActions();
+      this.pendingActions.length = 0;
     }
   },
 
@@ -160,7 +197,6 @@ game.Phase = {
       },
       PlayerId: player.id,
     });
-    moveRequest = this.connect(this.index, moveRequest);
 
     this.applyAction(moveRequest);
     this.sendAction(moveRequest);
