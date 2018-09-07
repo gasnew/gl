@@ -16,16 +16,17 @@ var game = {
     game.entities.init({
       chunk: game.chunk,
       players: Object.values(phase.index.Player),
+      username: phase.username,
     });
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
     game.draw.init();
 
-    this.subscribeTurnUpdates();
+    //this.subscribeActionUpdates();
   },
 
-  subscribeTurnUpdates: async function() {
-    var res = await game.Net.subscribeTurnUpdates();
-    var player = game.entities.players.find(p => p.name == res.playerName);
+  subscribeActionUpdates: async function() {
+    var res = await game.Net.subscribeActionUpdates();
+    var player = game.entities.player;
     if (player) {
       player.turn = res.turn;
       player.fastForward();

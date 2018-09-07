@@ -7,6 +7,7 @@ module.exports = function(sequelize, DataTypes) {
 
   Action.associate = function(models) {
     Action.belongsTo(models.Phase);
+    Action.belongsTo(models.Player);
   };
 
   return Action;

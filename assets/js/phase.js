@@ -4,22 +4,23 @@ game.Phase = {
   pendingActions: [],
 
   init: function({ state }) {
-    this.index = this.connect(this.digestIndex(state.snapshotIndex));
+    this.index = this.connectInternally(this.digestIndex(state.snapshotIndex));
     console.log(this.index);
     this.verifiedActions = state.actions;
     console.log(this.verifiedActions);
+    this.username = state.username;
 
     this.fastForward();
   },
 
-  digestIndex: function(index) {
-    return Object.keys(index).reduce(
-      (indexWithFunctions, modelName) => ({
-        ...indexWithFunctions,
-        [modelName]: Object.keys(index[modelName]).reduce(
-          (recordsWithFunctions, id) => ({
-            ...recordsWithFunctions,
-            [id]: game.Utils.create(modelName, index[modelName][id]),
+  digestIndex: function(recordIndex) {
+    return Object.keys(recordIndex).reduce(
+      (indexAsAssets, modelName) => ({
+        ...indexAsAssets,
+        [modelName]: Object.keys(recordIndex[modelName]).reduce(
+          (assets, id) => ({
+            ...assets,
+            [id]: game.Utils.create(modelName, recordIndex[modelName][id]),
           }),
           {}
         ),
@@ -28,35 +29,46 @@ game.Phase = {
     );
   },
 
-  connect: function(index) {
+  connect: function(index, asset) {
+    for (let property of Object.keys(asset)) {
+      if (property.endsWith('Id') && property !== 'Id') {
+        const relatedModelName = property.replace('Id', '');
+        asset[relatedModelName] =
+          index[relatedModelName][asset[property]];
+      }
+    }
+
+    return asset;
+  },
+
+  connectInternally: function(index) {
     let connectedIndex = {};
     for (let modelName of Object.keys(index)) {
       connectedIndex[modelName] = {};
-      let records = index[modelName];
-      for (let id of Object.keys(records)) {
-        let record = records[id];
-        connectedIndex[modelName][id] = record;
-        for (let property of Object.keys(record)) {
-          if (property.endsWith('Id') && property !== 'Id') {
-            const relatedModelName = property.replace('Id', '');
-            record[relatedModelName] =
-              index[relatedModelName][record[property]];
-          }
-        }
+      let assets = index[modelName];
+      for (let id of Object.keys(assets)) {
+        let asset = assets[id];
+        connectedIndex[modelName][id] = this.connect(index, asset);
       }
     }
 
     return connectedIndex;
   },
 
-  digestAndMergeIntoIndex: function(index) {
-    for (const modelName of Object.keys(index)) {
-      const records = index[modelName];
+  digestAndMergeIntoIndex: function(recordIndex) {
+    for (const modelName of Object.keys(recordIndex)) {
+      const records = recordIndex[modelName];
       for (const id of Object.keys(records)) {
         this.index[modelName][id] = game.Utils.create(modelName, records[id]);
       }
     }
-    this.index = this.connect(this.index);
+    for (const modelName of Object.keys(recordIndex)) {
+      const records = recordIndex[modelName];
+      for (const id of Object.keys(records)) {
+        const asset = this.index[modelName][id];
+        this.index[modelName][id] = this.connect(this.index, asset);
+      }
+    }
   },
 
   fastForward: function() {
@@ -78,11 +90,12 @@ game.Phase = {
       console.log('index');
       console.log(this.index);
     } else if (action.type === 'move') {
-      const tile = action.content.toTile;
+      const tile = this.deserialize(action.content.toTile);
+      const player = this.index.Player[action.PlayerId];
 
-      this.x = tile.x;
-      this.y = tile.y;
-      this.tile = tile;
+      player.x = tile.x;
+      player.y = tile.y;
+      player.tile = tile;
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
@@ -96,11 +109,12 @@ game.Phase = {
 
   undoAction: function(action) {
     if (action.type === 'move') {
-      var tile = action.content.fromTile;
+      const tile = this.deserialize(action.content.fromTile);
+      const player = this.index.Player[action.PlayerId];
 
-      this.x = tile.x;
-      this.y = tile.y;
-      this.tile = tile;
+      player.x = tile.x;
+      player.y = tile.y;
+      player.tile = tile;
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
@@ -114,13 +128,41 @@ game.Phase = {
     try {
       var actionId = await game.Net.postAction(action);
       console.log(actionId);
-      this.turn.push(action);
-    } catch (turnJSON) {
+      this.pendingActions.push(action);
+    } catch (error) {
       console.error('Action failed!');
+      console.error(error);
       this.undoAction(action);
       this.rewind();
-      this.turn.splice(turnJSON.length, this.turn.length);
+      this.pendingActions.splice(this.pendingActions.indexOf(action));
       this.fastForward();
     }
+  },
+
+  // ACTIONS
+  serialize: function(modelName, asset) {
+    return {
+      modelName,
+      id: asset.id,
+    };
+  },
+
+  deserialize: function(serializedAsset) {
+    return this.index[serializedAsset.modelName][serializedAsset.id];
+  },
+
+  moveTo: async function(player, tile) {
+    var moveRequest = Object.create(game.Action.MoveRequest);
+    moveRequest.init({
+      content: {
+        fromTile: this.serialize('Tile', player.tile),
+        toTile: this.serialize('Tile', tile),
+      },
+      PlayerId: player.id,
+    });
+    moveRequest = this.connect(this.index, moveRequest);
+
+    this.applyAction(moveRequest);
+    this.sendAction(moveRequest);
   },
 };

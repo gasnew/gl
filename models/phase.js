@@ -79,12 +79,13 @@ module.exports = function(sequelize, DataTypes) {
         };
         await action.save({ transaction: transaction });
       } else if (action.type == 'move') {
-        var player = await this.getPlayer({ transaction: transaction });
-        var dist = math.tilesTo(player, action.content.toTile);
+        const player = await action.getPlayer({ transaction: transaction });
+        const toTile = await Phase.deserialize(action.content.toTile);
+        const dist = math.tilesTo(player, toTile);
         if (dist !== 1) throw new Error('Invalid move of distance ' + dist);
 
-        player.x = action.content.toTile.x;
-        player.y = action.content.toTile.y;
+        player.x = toTile.x;
+        player.y = toTile.y;
         await player.save({ transaction: transaction });
       } else if (action.type == 'transfer') {
         console.log(action.content.fromContainer);
@@ -135,6 +136,12 @@ module.exports = function(sequelize, DataTypes) {
         );
       }
       return snapshotIndex;
+    };
+
+    Phase.deserialize = async function(serializedAsset) {
+      return await models[serializedAsset.modelName].findOne({
+        where: { id: serializedAsset.id },
+      });
     };
   };
 

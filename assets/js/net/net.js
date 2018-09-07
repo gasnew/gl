@@ -51,7 +51,7 @@ game.Net = {
     this.reqQueue.length = 0;
   },
 
-  post: function(addr, content, { noQueue = false }) {
+  post: function(addr, content, { noQueue = false } = {}) {
     if (noQueue) return this.addRequestNoQueue('POST', addr, content);
     else return this.addRequest('POST', addr, content);
   },
@@ -78,7 +78,7 @@ game.Net = {
   },
 
   postAction: function(actionRequest) {
-    return this.post('turns/new-action', actionRequest);
+    return this.post('phases/new-action', actionRequest);
   },
 
   subscribeActionUpdates: function(latestActionId) {

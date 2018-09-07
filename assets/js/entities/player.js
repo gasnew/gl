@@ -6,22 +6,12 @@ game.Player = {
     this.y = y;
     this.UserId = UserId;
 
-    this.pendingActions = [];
-    this.Inventory = null;
-
     return this;
   },
 
   // MOVE
-  moveTo: async function(tile) {
-    var moveRequest = Object.create(game.Action.MoveRequest);
-    moveRequest.init({
-      fromTile: this.tile,
-      toTile: tile,
-    });
-
-    this.applyAction(moveRequest);
-    this.sendAction(moveRequest);
+  moveTo: function(tile) {
+    game.phase.moveTo(this, tile);
   },
 
   // TRANSFER
@@ -74,7 +64,7 @@ game.Player = {
 
   applyAction: function(action) {
     if (action.type === 'move') {
-      var tile = action.content.toTile;
+      let tile = action.content.toTile;
 
       this.x = tile.x;
       this.y = tile.y;
