@@ -21,19 +21,17 @@ var game = {
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
     game.draw.init();
 
-    //this.subscribeActionUpdates();
+    this.subscribeActionUpdates(
+      game.phase.actions[game.phase.actions.length - 1].id
+    );
   },
 
-  subscribeActionUpdates: async function() {
-    var res = await game.Net.subscribeActionUpdates();
-    var player = game.entities.player;
-    if (player) {
-      player.turn = res.turn;
-      player.fastForward();
-      console.log(player.name + "'s turn updated!");
-    }
+  subscribeActionUpdates: async function(lastActionId) {
+    const response = await game.Net.subscribeActionUpdates(lastActionId);
+    const newActions = response.newActions;
+    for (const action of newActions) game.phase.insertAction(action);
 
-    this.subscribeTurnUpdates();
+    this.subscribeActionUpdates(newActions[newActions.length - 1].id);
   },
 
   update: () => {

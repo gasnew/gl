@@ -5,25 +5,35 @@ var router = express.Router();
 var actionWatcher = {
   subscriptions: [],
 
-  subscribe: function(latestActionId, onDispatch) {
+  subscribe: function(PlayerId, latestActionId, onDispatch) {
     let subscription = {
+      PlayerId,
       latestActionId,
       onDispatch,
     };
+    this.subscriptions = this.subscriptions.filter(
+      subscription => subscription.PlayerId !== PlayerId
+    );
     this.subscriptions.push(subscription);
   },
 
-  dispatch: async function() {
+  dispatch: async function(actionPlayerId) {
     for (var subscription of this.subscriptions) {
+      if (subscription.PlayerId === actionPlayerId)
+        continue;
       let actions = await models.Action.findAll({
         where: {
           Id: { [models.Sequelize.Op.gt]: subscription.latestActionId },
+          PlayerId: { [models.Sequelize.Op.not]: subscription.PlayerId },
         },
       });
-      subscription.onDispatch(actions);
+      await subscription.onDispatch(actions);
+      subscription.dispatched = true;
     }
 
-    this.subscriptions.length = 0;
+    this.subscriptions = this.subscriptions.filter(
+      subscription => !subscription.dispatched
+    );
   },
 };
 
@@ -62,23 +72,24 @@ router.post('/new-action', async function(req, res) {
         actionId: action.id,
       },
     });
+
+    actionWatcher.dispatch(player.id);
   } catch (e) {
     console.error(e);
-    console.log(`error: ${e}`);
     res.json({
       success: false,
       content: String(e),
     });
   }
-
-  actionWatcher.dispatch();
 });
 
-router.post('/subscribe-action-updates', function(req, res) {
-  actionWatcher.subscribe(req.body.latestActionId, newActions => {
+router.post('/subscribe-action-updates', async function(req, res) {
+  const user = await models.User.findOne({ where: { name: req.user.name } });
+  const player = await models.Player.findOne({ where: { UserId: user.id } });
+  actionWatcher.subscribe(player.id, req.body.latestActionId, newActions => {
     res.json({
       success: true,
-      content: newActions,
+      content: { newActions: newActions },
     });
   });
 });

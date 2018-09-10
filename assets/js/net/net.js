@@ -86,7 +86,7 @@ game.Net = {
 
   subscribeActionUpdates: function(latestActionId) {
     return this.post(
-      'turns/subscribe-action-updates',
+      'phases/subscribe-action-updates',
       { latestActionId },
       { noQueue: true }
     );
