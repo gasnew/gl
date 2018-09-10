@@ -85,6 +85,12 @@ game.Phase = {
     }
   },
 
+  fastForwardPendingActions: function() {
+    for (const action of this.pendingActions) {
+      this.applyAction(action);
+    }
+  },
+
   rewind: function({ throughId } = {}) {
     for (
       let i = this.actions.length - 1;
@@ -96,8 +102,8 @@ game.Phase = {
   },
 
   rewindPendingActions: function() {
-    for (const action of this.pendingActions.reverse()) {
-      this.undoAction(action);
+    for (let i = this.pendingActions.length - 1; i >= 0; i--) {
+      this.undoAction(this.pendingActions[i]);
     }
   },
 
@@ -111,6 +117,7 @@ game.Phase = {
       player.x = tile.x;
       player.y = tile.y;
       player.tile = tile;
+      console.log('action', action.id, 'move to', tile.x, tile.y);
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
@@ -130,6 +137,7 @@ game.Phase = {
       player.x = tile.x;
       player.y = tile.y;
       player.tile = tile;
+      console.log('undo action', action.id, 'move to', tile.x, tile.y);
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
@@ -139,7 +147,14 @@ game.Phase = {
     }
   },
 
-  insertAction: function(actionToInsert) {
+  insertAction: function(actionToInsert, { removeFromPending = false } = {}) {
+    this.rewindPendingActions();
+    if (removeFromPending) {
+      const verifiedAction = this.pendingActions.shift();
+      if (actionToInsert !== verifiedAction)
+        throw Error('pendingActions is screwed up for some reason!!');
+    }
+
     let throughId = null;
     for (
       let i = this.actions.length - 1;
@@ -148,7 +163,6 @@ game.Phase = {
     ) {
       throughId = this.actions[i].id;
     }
-    this.undoAction(actionToInsert);
     let laterActions = [];
     if (throughId) {
       this.rewind({ throughId });
@@ -157,15 +171,17 @@ game.Phase = {
     this.actions.push(actionToInsert);
     this.actions = this.actions.concat(laterActions);
     this.fastForward({ fromId: actionToInsert.id });
+
+    this.fastForwardPendingActions();
   },
 
   sendAction: async function(action) {
     try {
       this.pendingActions.push(action);
       var response = await game.Net.postAction(action);
-      this.pendingActions.shift();
+      console.log('got action id', response.actionId);
       action.id = response.actionId;
-      this.insertAction(action);
+      this.insertAction(action, { removeFromPending: true });
       console.log(action);
       console.log(this.actions);
     } catch (error) {
