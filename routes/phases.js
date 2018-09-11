@@ -94,4 +94,7 @@ router.post('/subscribe-action-updates', async function(req, res) {
   });
 });
 
-module.exports = router;
+module.exports = {
+  router,
+  actionWatcher,
+};

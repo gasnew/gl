@@ -15,7 +15,7 @@ var users = require('./routes/users.js');
 var players = require('./routes/players.js');
 var inventories = require('./routes/inventories.js');
 var chunks = require('./routes/chunks.js');
-var phases = require('./routes/phases.js');
+var phases = require('./routes/phases.js').router;
 
 // CONFIGURE APP
 var app = express();

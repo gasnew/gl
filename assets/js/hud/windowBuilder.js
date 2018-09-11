@@ -39,16 +39,17 @@ game.hud.WindowBuilder = {
           },
 
           onDown: function() {
+            const player = game.entities.getMainPlayer();
             console.log(slot);
             console.log(slot.empty());
             if (!slot.empty() && game.draw.canvas.cursor.empty()) {
-              game.entities.player.startTransfer({
+              player.startTransfer({
                 from: slot,
                 through: game.draw.canvas.cursor
               });
             } else if (slot.empty()
-              && game.entities.player.pendingTransfer()) {
-              game.entities.player.completeTransfer({
+              && player.pendingTransfer()) {
+              player.completeTransfer({
                 to: slot,
               });
             }

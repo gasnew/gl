@@ -45,22 +45,22 @@ module.exports = function(sequelize, DataTypes) {
       if (action.type == 'createUser') {
         const userInfo = action.content;
         const user = await models.User.create(userInfo, {
-          transaction: transaction,
+          transaction,
         });
         const player = await user.createPlayer(
           { x: 15, y: 15 },
-          { transaction: transaction }
+          { transaction }
         );
         const inventory = await player.createInventory(
           { rows: 3, cols: 5 },
-          { transaction: transaction }
+          { transaction }
         );
         await inventory.makeSlots(transaction);
         await (await inventory.getAt(0, 0, transaction)).createItem(
           {
             type: 'berry',
           },
-          { transaction: transaction }
+          { transaction }
         );
 
         action.newRecords = {
@@ -68,7 +68,7 @@ module.exports = function(sequelize, DataTypes) {
           Player: { [player.id]: player },
           Inventory: { [inventory.id]: inventory },
           InvSlot: (await inventory.getInvSlots({
-            transaction: transaction,
+            transaction,
           })).reduce(
             (slots, slot) => ({
               ...slots,
@@ -77,26 +77,26 @@ module.exports = function(sequelize, DataTypes) {
             {}
           ),
         };
-        await action.save({ transaction: transaction });
+        await action.save({ transaction });
       } else if (action.type == 'move') {
-        const player = await action.getPlayer({ transaction: transaction });
+        const player = await action.getPlayer({ transaction });
         const toTile = await Phase.deserialize(action.content.toTile);
         const dist = math.tilesTo(player, toTile);
         if (dist !== 1) throw new Error('Invalid move of distance ' + dist);
 
         player.x = toTile.x;
         player.y = toTile.y;
-        await player.save({ transaction: transaction });
+        await player.save({ transaction });
       } else if (action.type == 'transfer') {
         console.log(action.content.fromContainer);
         var item = await models.Item.find({
           where: { id: action.content.item.id },
-          transaction: transaction,
+          transaction,
         });
         var c2Type = 'InvSlot';
         var c2 = await models[c2Type].find({
           id: action.content.toContainer.id,
-          transaction: transaction,
+          transaction,
         });
 
         // TODO Add validation here
@@ -104,7 +104,7 @@ module.exports = function(sequelize, DataTypes) {
         // - placed within acceptable distance from player?
         if (1 != 1) throw new Error('Truth is not true');
 
-        await c2.setItem(item, { transaction: transaction });
+        await c2.setItem(item, { transaction });
       } else {
         throw new Error('No action of type ' + action.type);
       }

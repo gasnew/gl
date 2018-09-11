@@ -15,7 +15,6 @@ var game = {
 
     game.entities.init({
       chunk: game.chunk,
-      players: Object.values(phase.index.Player),
       username: phase.username,
     });
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
@@ -40,8 +39,8 @@ var game = {
     game.hud.update();
 
     game.draw.chunk(game.chunk.tiles);
-    game.draw.entities.players(game.entities.players);
-    game.draw.entities.player(game.entities.player);
+    game.draw.entities.players(game.entities.getPlayers());
+    game.draw.entities.player(game.entities.getMainPlayer());
     game.draw.hud.windows(game.hud.windows);
     game.draw.hud.cursor(game.draw.canvas.cursor);
   },
