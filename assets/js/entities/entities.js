@@ -1,10 +1,21 @@
 game.entities = {
-  init: function(chunk, entities) {
+  init: function({ chunk, username }) {
     this.chunk = chunk;
 
-    this.player = entities.mainPlayer;
-    this.players = entities.players;
-    this.player.tile = chunk.tileAt(this.player.y, this.player.x);
+    this.username = username;
+    const player = this.getMainPlayer();
+    player.tile = chunk.tileAt(player.y, player.x);
+  },
+
+  getMainPlayer: function() {
+    return Object.values(game.phase.index.Player).find(
+      p => p.User.name === this.username
+    );
+  },
+
+  getPlayers: function() {
+    return Object.values(game.phase.index.Player).filter(
+      player => player.User.name !== this.username
+    );
   },
 };
-

@@ -1,8 +1,8 @@
 game.Action.MoveRequest = Object.create(game.Action);
 
 Object.assign(game.Action.MoveRequest, {
-  init: function({fromTile, toTile}) {
-    game.Action.init.call(this, 'move');
+  init: function({ id, content: { fromTile, toTile }, PlayerId }) {
+    game.Action.init.call(this, { id, type: 'move', PlayerId });
 
     this.content = {
       fromTile: fromTile,
@@ -10,4 +10,3 @@ Object.assign(game.Action.MoveRequest, {
     };
   },
 });
-

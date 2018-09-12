@@ -1,24 +1,27 @@
 var game = {
-  init: function (state) {
-    console.log(state);
-    game.chunk = state.chunk;
-    game.entities.init(game.chunk, state.entities);
+  beginPhase: function(phase) {
+    game.phase = phase;
+
+    game.chunk = game.phase.index.Chunk[1];
+
+    game.entities.init({
+      chunk: game.chunk,
+      username: phase.username,
+    });
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
     game.draw.init();
 
-    this.subscribeTurnUpdates();
+    this.subscribeActionUpdates(
+      game.phase.actions[game.phase.actions.length - 1].id
+    );
   },
 
-  subscribeTurnUpdates: async function() {
-    var res = await game.Net.subscribeTurnUpdates();
-    var player = game.entities.players.find(p => p.name == res.playerName);
-    if (player) {
-      player.turn = res.turn;
-      player.fastForward();
-      console.log(player.name + '\'s turn updated!');
-    }
+  subscribeActionUpdates: async function(lastActionId) {
+    const response = await game.Net.subscribeActionUpdates(lastActionId);
+    const newActions = response.newActions;
+    for (const action of newActions) game.phase.insertAction(action);
 
-    this.subscribeTurnUpdates();
+    this.subscribeActionUpdates(newActions[newActions.length - 1].id);
   },
 
   update: () => {
@@ -27,10 +30,9 @@ var game = {
     game.hud.update();
 
     game.draw.chunk(game.chunk.tiles);
-    game.draw.entities.players(game.entities.players);
-    game.draw.entities.player(game.entities.player);
+    game.draw.entities.players(game.entities.getPlayers());
+    game.draw.entities.player(game.entities.getMainPlayer());
     game.draw.hud.windows(game.hud.windows);
     game.draw.hud.cursor(game.draw.canvas.cursor);
   },
 };
-

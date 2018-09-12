@@ -3,14 +3,15 @@ game.hud = {
     this.chunk = chunk;
     this.entities = entities;
     this.cursor = cursor;
+    this.player = entities.getMainPlayer();
 
     this.highTile = null;
     this.downTile = null;
 
     this.windows = {
       inv: game.hud.WindowBuilder.start({x: 100, y: 50})
-        .addTitle({name: game.entities.player.name})
-        .addInventory({inv: game.entities.player.inventory})
+        .addTitle({name: this.player.name})
+        .addInventory({inv: this.player.inventory})
         .finish()
     };
     console.log(this.windows);
@@ -21,8 +22,8 @@ game.hud = {
     var clickedTile = this.getClickedTile();
 
     if (clickedTile
-        && game.Math.tilesTo(this.entities.player.tile, clickedTile) === 1) {
-      this.entities.player.moveTo(clickedTile);
+        && game.Math.tilesTo(this.player.tile, clickedTile) === 1) {
+      this.player.moveTo(clickedTile);
     }
   },
 

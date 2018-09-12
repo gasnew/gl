@@ -13,7 +13,7 @@ module.exports = function(sequelize, DataTypes) {
   });
 
   Chunk.associate = function(models) {
-    Chunk.hasMany(models.Tile);
+    Chunk.hasMany(models.Item);
   };
 
   return Chunk;

@@ -1,17 +1,18 @@
 game.Chunk = {
-  tiles: [],
+  init: function({ height, width }) {
+    this.height = height;
+    this.width = width;
 
-  init: function(tiles) {
-    this.tiles = tiles;
-    // this.tiles = new Array(rows);
-    // 
-    // for (var i = 0; i < rows; i++) {
-    //   this.tiles[i] = Array(cols);
-    //   for (var j = 0; j < cols; j++) {
-    //     var new_b = Object.create(game.Tile);
-    //     this.tiles[i][j] = new_b.init(j, i);
-    //   }
-    // }
+    this.tiles = Array(height);
+    for (let row = 0; row < height; row++) {
+      this.tiles[row] = Array(width);
+      for (let column = 0; column < width; column++) {
+        this.tiles[row][column] = game.Utils.create('Tile', {
+          x: column,
+          y: row,
+        });
+      }
+    }
   },
 
   tileAt: function(row, col) {
@@ -22,4 +23,3 @@ game.Chunk = {
     return null;
   },
 };
-

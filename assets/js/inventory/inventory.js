@@ -1,8 +1,8 @@
 game.Inventory = {
-  init: function(rows, cols, slots) {
+  init: function({ id, rows, cols, PlayerId }) {
+    this.id = id;
     this.rows = rows;
     this.cols = cols;
-    this.slots = slots;
+    this.PlayerId = PlayerId;
   },
 };
-

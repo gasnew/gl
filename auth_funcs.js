@@ -1,35 +1,43 @@
 var bcrypt = require('bcryptjs'),
   Q = require('q'),
   models = require('./models');
+const { actionWatcher } = require('./routes/phases.js');
 
 //used in local-signup strategy
-exports.localReg = async function (name, password) {
+exports.localReg = async function(name, password) {
   var deferred = Q.defer();
 
   console.log(name);
   //check if name is already assigned in our database
   var result = await models.User.findOne({
     where: {
-      'name': name
-    }
+      name: name,
+    },
   });
   if (null != result) {
     console.log('USERNAME ALREADY EXISTS:', result.name);
     deferred.resolve(false); // name exists
-  } else  {
+  } else {
     var hash = bcrypt.hashSync(password, 8);
     var user = {
-      'name': name,
-      'password': hash,
+      name: name,
+      password: hash,
     };
 
     console.log('CREATING USER:', name);
-    var u = await models.User.create(user);
-    var p = await u.createPlayer({x: 15, y: 15});
-    await p.createTurn({status: 'running'});
-    var i = await p.createInventory();
-    await i.makeSlots();
-    await (await i.getAt(0, 0)).createItem({type: 'berry'});
+    const phase = await models.Phase.getCurrent();
+    const newAction = await phase.integrateAction({
+      type: 'createUser',
+      content: user,
+    });
+    // Need to dispatch here as well since it is the only action that is not
+    // managed by the phases controller
+    const player = await (await models.User.findOne({
+      where: { name: user.name },
+    })).getPlayer();
+    newAction.PlayerId = player.id;
+    await newAction.save();
+    await actionWatcher.dispatch(player.id);
 
     deferred.resolve(user);
   }
@@ -37,37 +45,35 @@ exports.localReg = async function (name, password) {
   return deferred.promise;
 };
 
-
 //check if user exists
 //if user exists check if passwords match (use bcrypt.compareSync(password, hash); // true where 'hash' is password in DB)
 //if password matches take into website
 //if user doesn't exist or password doesn't match tell them it failed
-exports.localAuth = function (name, password) {
+exports.localAuth = function(name, password) {
   var deferred = Q.defer();
 
   models.User.findOne({
     where: {
-      'name': name
-    }
-  })
-    .then(function (result) {
-      if (null == result) {
-        console.log('USERNAME NOT FOUND:', name);
+      name: name,
+    },
+  }).then(function(result) {
+    if (null == result) {
+      console.log('USERNAME NOT FOUND:', name);
 
-        deferred.resolve(false);
+      deferred.resolve(false);
+    } else {
+      var hash = result.password;
+
+      console.log('FOUND USER: ' + result.name);
+
+      if (bcrypt.compareSync(password, hash)) {
+        deferred.resolve(result);
       } else {
-        var hash = result.password;
-
-        console.log('FOUND USER: ' + result.name);
-
-        if (bcrypt.compareSync(password, hash)) {
-          deferred.resolve(result);
-        } else {
-          console.log('AUTHENTICATION FAILED');
-          deferred.resolve(false);
-        }
+        console.log('AUTHENTICATION FAILED');
+        deferred.resolve(false);
       }
-    });
+    }
+  });
 
   return deferred.promise;
 };
