@@ -55,10 +55,11 @@ module.exports = function(sequelize, DataTypes) {
           { rows: 3, cols: 5 },
           { transaction }
         );
-        await inventory.makeSlots(transaction);
-        await (await inventory.getAt(0, 0, transaction)).createItem(
+        const item = await inventory.createItem(
           {
             type: 'berry',
+            x: 0,
+            y: 0,
           },
           { transaction }
         );
@@ -67,20 +68,12 @@ module.exports = function(sequelize, DataTypes) {
           User: { [user.id]: user },
           Player: { [player.id]: player },
           Inventory: { [inventory.id]: inventory },
-          InvSlot: (await inventory.getInvSlots({
-            transaction,
-          })).reduce(
-            (slots, slot) => ({
-              ...slots,
-              [slot.id]: slot,
-            }),
-            {}
-          ),
+          Item: { [item.id]: item },
         };
         await action.save({ transaction });
       } else if (action.type == 'move') {
         const player = await action.getPlayer({ transaction });
-        const toTile = await Phase.deserialize(action.content.toTile);
+        const toTile = action.content.toTile;
         const dist = math.tilesTo(player, toTile);
         if (dist !== 1) throw new Error('Invalid move of distance ' + dist);
 
@@ -118,12 +111,11 @@ module.exports = function(sequelize, DataTypes) {
 
     Phase.getSnapshotIndex = async function() {
       const modelNames = [
-        'Tile',
         'User',
         'Player',
         'Item',
         'Inventory',
-        'InvSlot',
+        'Chunk',
       ];
       let snapshotIndex = {};
       for (const modelName of modelNames) {

@@ -2,16 +2,7 @@ var game = {
   beginPhase: function(phase) {
     game.phase = phase;
 
-    const tiles = Object.values(phase.index.Tile);
-    game.chunk = game.Utils.create('Chunk', {
-      tiles: game.Utils.arrange({
-        items: tiles,
-        numRows: 25,
-        numColumns: 25,
-        getRow: tile => tile.y,
-        getColumn: tile => tile.x,
-      }),
-    });
+    game.chunk = game.phase.index.Chunk[1];
 
     game.entities.init({
       chunk: game.chunk,

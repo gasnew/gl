@@ -1,6 +1,18 @@
 game.Chunk = {
-  init: function({ tiles }) {
-    this.tiles = tiles;
+  init: function({ height, width }) {
+    this.height = height;
+    this.width = width;
+
+    this.tiles = Array(height);
+    for (let row = 0; row < height; row++) {
+      this.tiles[row] = Array(width);
+      for (let column = 0; column < width; column++) {
+        this.tiles[row][column] = game.Utils.create('Tile', {
+          x: column,
+          y: row,
+        });
+      }
+    }
   },
 
   tileAt: function(row, col) {

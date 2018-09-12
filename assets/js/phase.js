@@ -111,7 +111,7 @@ game.Phase = {
     if (action.type === 'createUser') {
       this.digestAndMergeIntoIndex(action.newRecords);
     } else if (action.type === 'move') {
-      const tile = this.deserialize(action.content.toTile);
+      const tile = action.content.toTile;
       const player = this.index.Player[action.PlayerId];
 
       player.x = tile.x;
@@ -131,7 +131,7 @@ game.Phase = {
 
   undoAction: function(action) {
     if (action.type === 'move') {
-      const tile = this.deserialize(action.content.fromTile);
+      const tile = action.content.fromTile;
       const player = this.index.Player[action.PlayerId];
 
       player.x = tile.x;
@@ -208,8 +208,8 @@ game.Phase = {
     var moveRequest = Object.create(game.Action.MoveRequest);
     moveRequest.init({
       content: {
-        fromTile: this.serialize('Tile', player.tile),
-        toTile: this.serialize('Tile', tile),
+        fromTile: player.tile,
+        toTile: tile,
       },
       PlayerId: player.id,
     });

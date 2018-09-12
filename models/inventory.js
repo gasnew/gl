@@ -14,31 +14,7 @@ module.exports = function(sequelize, DataTypes) {
 
   Inventory.associate = function(models) {
     Inventory.belongsTo(models.Player);
-    Inventory.hasMany(models.InvSlot);
-  };
-
-  Inventory.protFuncs = function(models) {
-    Inventory.prototype.makeSlots = async function(transaction) {
-      for (var r = 0; r < this.rows; r++) {
-        for (var c = 0; c < this.cols; c++) {
-          await this.createInvSlot(
-            { row: r, col: c },
-            { transaction: transaction }
-          );
-        }
-      }
-    };
-
-    Inventory.prototype.getAt = async function(row, col, transaction) {
-      return await models.InvSlot.find({
-        where: {
-          InventoryId: this.id,
-          row: row,
-          col: col,
-        },
-        transaction: transaction,
-      });
-    };
+    Inventory.hasMany(models.Item);
   };
 
   return Inventory;
