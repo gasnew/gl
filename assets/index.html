@@ -3,63 +3,45 @@
     <head>
         <meta charset="utf-8" />
         <title>GL</title>
-        
+
         <!-- The stylesheets -->
+        <script src="pixi.js"></script>
     </head>
-    
+
     <body style="margin:0px;">
-	<!-- Visual thangs. -->
-	<canvas id='canvas' width='800' height='800'></canvas>
-	<button type='button' onclick='submitTurn()'>Sumit Turn!</button>
-	<button type='button' onclick='logTurn()'>Log Turn!</button>
-	<button type='button' onclick='newTurn()'>New Turn!</button>
-
         <!-- JavaScript includes. -->
-	<script type='text/javascript' src="./js/game.js"></script>
-	<script type='text/javascript' src="./js/phase.js"></script>
-	<script type='text/javascript' src="./js/user.js"></script>
-	<script type='text/javascript' src="./js/math.js"></script>
-	<script type='text/javascript' src="./js/utils.js"></script>
-	<script type='text/javascript' src="./js/tile.js"></script>
-	<script type='text/javascript' src="./js/chunk.js"></script>
-	<script type='text/javascript' src="./js/entities/entities.js"></script>
-	<script type='text/javascript' src="./js/entities/player.js"></script>
-	<script type='text/javascript' src="./js/hud/hud.js"></script>
-	<script type='text/javascript' src="./js/hud/windowBuilder.js"></script>
-	<script type='text/javascript' src="./js/hud/window.js"></script>
-	<script type='text/javascript' src="./js/hud/pane.js"></script>
-	<script type='text/javascript' src="./js/hud/cell.js"></script>
-	<script type='text/javascript' src="./js/inventory/inventory.js"></script>
-	<script type='text/javascript' src="./js/inventory/invSlot.js"></script>
-	<script type='text/javascript' src="./js/hud/item.js"></script>
-	<script type='text/javascript' src="./js/action/action.js"></script>
-	<script type='text/javascript' src="./js/action/move.js"></script>
-	<script type='text/javascript' src="./js/action/transfer.js"></script>
-	<script type='text/javascript' src="./js/net/net.js"></script>
-	<script type='text/javascript' src="./js/net/state.js"></script>
-	<script type='text/javascript' src="./js/draw/draw.js"></script>
-	<script type='text/javascript' src="./js/draw/canvas.js"></script>
-	<script type='text/javascript' src="./js/draw/entities.js"></script>
-	<script type='text/javascript' src="./js/draw/hud.js"></script>
-	<script type='text/javascript' src="./js/main.js"></script>
-
-	<!-- Funny methods. -->
-	<script type='text/javascript'>
-	  async function submitTurn() {
-            var res = await game.Net.submitTurn();
-            console.log('Turn submitted!');
-            console.log(res);
-            game.entities.player.turn = [];
-	  }
-	  async function logTurn() {
-            var res = await game.Net.getTurn();
-            console.log(res);
-	  }
-	  async function newTurn() {
-            var res = await game.Net.newTurn();
-            console.log('Turn finished!');
-	  }
-	</script>
-	
+        <script type="text/javascript">
+            let type = "WebGL"
+            if(!PIXI.utils.isWebGLSupported()){
+              type = "canvas"
+            }
+        </script>
+        <script type='text/javascript' src="./js/game.js"></script>
+        <script type='text/javascript' src="./js/phase.js"></script>
+        <script type='text/javascript' src="./js/user.js"></script>
+        <script type='text/javascript' src="./js/math.js"></script>
+        <script type='text/javascript' src="./js/utils.js"></script>
+        <script type='text/javascript' src="./js/tile.js"></script>
+        <script type='text/javascript' src="./js/chunk.js"></script>
+        <script type='text/javascript' src="./js/entities/entities.js"></script>
+        <script type='text/javascript' src="./js/entities/player.js"></script>
+        <script type='text/javascript' src="./js/hud/hud.js"></script>
+        <script type='text/javascript' src="./js/hud/windowBuilder.js"></script>
+        <script type='text/javascript' src="./js/hud/window.js"></script>
+        <script type='text/javascript' src="./js/hud/pane.js"></script>
+        <script type='text/javascript' src="./js/hud/cell.js"></script>
+        <script type='text/javascript' src="./js/inventory/inventory.js"></script>
+        <script type='text/javascript' src="./js/inventory/invSlot.js"></script>
+        <script type='text/javascript' src="./js/hud/item.js"></script>
+        <script type='text/javascript' src="./js/action/action.js"></script>
+        <script type='text/javascript' src="./js/action/move.js"></script>
+        <script type='text/javascript' src="./js/action/transfer.js"></script>
+        <script type='text/javascript' src="./js/net/net.js"></script>
+        <script type='text/javascript' src="./js/net/state.js"></script>
+        <script type='text/javascript' src="./js/draw/draw.js"></script>
+        <script type='text/javascript' src="./js/draw/canvas.js"></script>
+        <script type='text/javascript' src="./js/draw/entities.js"></script>
+        <script type='text/javascript' src="./js/draw/hud.js"></script>
+        <script type='text/javascript' src="./js/main.js"></script>
     </body>
 </html>

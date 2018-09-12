@@ -32,6 +32,7 @@ module.exports = {
         "max-len": 2,
     },
     "globals": {
-        "game": false
+        "game": false,
+        "PIXI": false
     }
 };
