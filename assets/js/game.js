@@ -1,5 +1,5 @@
 var game = {
-  beginPhase: function(phase) {
+  beginPhase: function(stage, phase) {
     game.phase = phase;
 
     game.chunk = game.phase.index.Chunk[1];
@@ -9,7 +9,7 @@ var game = {
       username: phase.username,
     });
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
-    game.draw.init();
+    game.draw.init(stage);
 
     this.subscribeActionUpdates(
       game.phase.actions[game.phase.actions.length - 1].id
@@ -24,15 +24,16 @@ var game = {
     this.subscribeActionUpdates(newActions[newActions.length - 1].id);
   },
 
-  update: () => {
-    game.draw.reset();
+  update: (delta) => {
+    //game.draw.reset();
 
     game.hud.update();
+    game.draw.update(delta);
 
-    game.draw.chunk(game.chunk.tiles);
-    game.draw.entities.players(game.entities.getPlayers());
-    game.draw.entities.player(game.entities.getMainPlayer());
-    game.draw.hud.windows(game.hud.windows);
-    game.draw.hud.cursor(game.draw.canvas.cursor);
+    //game.draw.chunk(game.chunk.tiles);
+    //game.draw.entities.players(game.entities.getPlayers());
+    //game.draw.entities.player(game.entities.getMainPlayer());
+    //game.draw.hud.windows(game.hud.windows);
+    //game.draw.hud.cursor(game.draw.canvas.cursor);
   },
 };

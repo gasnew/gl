@@ -3,8 +3,8 @@ var models = require('../models');
 (async function() {
   await models.sequelize.sync({ force: true });
 
-  const HEIGHT = 25;
-  const WIDTH = 25;
+  const HEIGHT = 15;
+  const WIDTH = 15;
 
   await models.Chunk.create({ height: HEIGHT, width: WIDTH });
 

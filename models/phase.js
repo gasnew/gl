@@ -48,7 +48,7 @@ module.exports = function(sequelize, DataTypes) {
           transaction,
         });
         const player = await user.createPlayer(
-          { x: 15, y: 15 },
+          { x: 8, y: 8 },
           { transaction }
         );
         const inventory = await player.createInventory(
