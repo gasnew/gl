@@ -23,16 +23,31 @@ game.keys = {
 
   bind: () => {
     window.addEventListener('keydown', game.keys.onKeydown, false);
+    window.addEventListener('keyup', game.keys.onKeyup, false);
   },
 
   onKeydown: event => {
-    console.log(event.keyCode);
-    const actionNames = Object.keys(game.keys.bindings).filter(
-      bindingName =>
-        game.keys.names[game.keys.bindings[bindingName]] === event.keyCode
-    );
-    actionNames.forEach(actionName => game.keys.actions[actionName].onDown());
+    game.keys.mapCodeToActionNames(event.keyCode).forEach(actionName => {
+      const action = game.keys.actions[actionName];
+      if (!action.isDown) {
+        action.isDown = true;
+        action.onDown();
+      }
+    });
   },
+
+  onKeyup: event => {
+    game.keys.mapCodeToActionNames(event.keyCode).forEach(actionName => {
+      const action = game.keys.actions[actionName];
+      action.isDown = false;
+    });
+  },
+
+  mapCodeToActionNames: keyCode =>
+    Object.keys(game.keys.bindings).filter(
+      bindingName =>
+        game.keys.names[game.keys.bindings[bindingName]] === keyCode
+    ),
 
   dispatch: callbacks => callbacks.forEach(callback => callback()),
 
