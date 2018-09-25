@@ -11,7 +11,7 @@ game.draw.Land = ({ height, width, addChild }) => {
   }
 };
 
-game.draw.Piles = ({ height, width, addChild, addFilter}) => {
+game.draw.Piles = ({ height, width, addChild, addFilter }) => {
   const pileTexture = PIXI.Texture.fromImage('../../textures/dirtLong.png');
 
   const piles = Array(4);
@@ -46,14 +46,8 @@ game.draw.Piles = ({ height, width, addChild, addFilter}) => {
     for (let position = 0; position < width; position++) {
       const pile = new PIXI.Sprite(pileTexture);
       const edge = edges[edgeNumber];
-      pile.x =
-        edge.getColumn(position) * 16 +
-        16 / 2 +
-        edge.offset.x;
-      pile.y =
-        edge.getRow(position) * 16 +
-        16 / 2 +
-        edge.offset.y;
+      pile.x = edge.getColumn(position) * 16 + 16 / 2 + edge.offset.x;
+      pile.y = edge.getRow(position) * 16 + 16 / 2 + edge.offset.y;
       pile.pivot.x = 16 / 2 + edge.offset.x;
       pile.pivot.y = 0;
 
@@ -68,14 +62,29 @@ game.draw.Piles = ({ height, width, addChild, addFilter}) => {
 };
 
 game.draw.Fixtures = ({ fixtures, addChild }) => {
-  const fixtureTexture = PIXI.Texture.fromImage('../../textures/bush.jpg');
+  const texture = PIXI.Texture.fromImage('../../textures/bush.jpg');
 
-  return fixtures.map(fixture => {
-    const sprite = new PIXI.Sprite(fixtureTexture);
-    sprite.x = (fixture.x + 0.5) * 16;
-    sprite.y = (fixture.y + 0.5) * 16;
+  return game.draw.Billboards({ billboards: fixtures, texture, addChild });
+};
+
+game.draw.Players = ({ players, addChild }) => {
+  const texture = PIXI.Texture.fromImage('../../textures/man.png');
+
+  return game.draw.Billboards({
+    billboards: players,
+    texture,
+    addChild,
+    xPivot: 16 / 4,
+  });
+};
+
+game.draw.Billboards = ({ billboards, texture, addChild, xPivot = 16 / 2 }) => {
+  return billboards.map(billboard => {
+    const sprite = new PIXI.Sprite(texture);
+    sprite.x = (billboard.x + 0.5) * 16;
+    sprite.y = (billboard.y + 0.5) * 16;
     sprite.pivot.y = 16 * 0.75;
-    sprite.pivot.x = 16 / 2;
+    sprite.pivot.x = xPivot;
 
     addChild(sprite);
 

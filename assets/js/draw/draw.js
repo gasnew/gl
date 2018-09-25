@@ -7,6 +7,7 @@ game.draw = {
 
     const chunk = game.phase.index.Chunk[1];
     const fixtures = Object.values(game.phase.index.Fixture);
+    const players = Object.values(game.phase.index.Player);
 
     const filters = {
       piles: [0, 1, 2, 3].map(() => new PIXI.filters.ColorMatrixFilter()),
@@ -21,9 +22,11 @@ game.draw = {
         width,
         addChild,
         addFilter: (sprite, edgeNumber) =>
-          sprite.filters = [filters.piles[edgeNumber]],
+          (sprite.filters = [filters.piles[edgeNumber]]),
       }),
-      billboards: game.draw.Fixtures({ fixtures, addChild }),
+      billboards: game.draw
+        .Fixtures({ fixtures, addChild })
+        .concat(game.draw.Players({ players, addChild })),
     };
 
     landContainer.height *= this.DRAW_SCALE;
