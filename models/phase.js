@@ -116,6 +116,7 @@ module.exports = function(sequelize, DataTypes) {
         'Item',
         'Inventory',
         'Chunk',
+        'Fixture',
       ];
       let snapshotIndex = {};
       for (const modelName of modelNames) {

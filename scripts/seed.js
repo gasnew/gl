@@ -6,7 +6,19 @@ var models = require('../models');
   const HEIGHT = 15;
   const WIDTH = 15;
 
-  await models.Chunk.create({ height: HEIGHT, width: WIDTH });
+  const chunk = await models.Chunk.create({ height: HEIGHT, width: WIDTH });
+  const locations = [
+    [5, 10],
+    [6, 10],
+    [6, 11],
+    [7, 11],
+    [7, 10],
+    [10, 10],
+    [10, 9],
+    [10, 11]
+  ];
+  for (const location of locations)
+    await chunk.createFixture({ type: 'bush', x: location[0], y: location[1] });
 
   const snapshotIndex = await models.Phase.getSnapshotIndex();
   await models.Phase.create({ status: 'active', snapshotIndex });

@@ -2,12 +2,12 @@
   "bush": {
     "image": "bush.png",
     "inventory": {
-      "capacity": 2,
+      "rows": 2,
+      "cols": 2,
       "items": [
         {
           "name": "berry",
-          "quantityMin": 2,
-          "quantityMax": 4
+          "quantity": [2, 4]
         }
       ],
       "refreshDelay": 1

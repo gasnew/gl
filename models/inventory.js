@@ -1,11 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
   var Inventory = sequelize.define('Inventory', {
-    rows: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 3,
-    },
-    cols: {
+    capacity: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 5,
