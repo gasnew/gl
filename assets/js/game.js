@@ -1,5 +1,7 @@
 var game = {
   beginPhase: function(stage, phase) {
+    game.keys.bind();
+
     game.phase = phase;
 
     game.chunk = game.phase.index.Chunk[1];
@@ -9,6 +11,7 @@ var game = {
       username: phase.username,
     });
     game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
+    game.camera.init();
     game.draw.init(stage);
 
     this.subscribeActionUpdates(
@@ -25,14 +28,10 @@ var game = {
   },
 
   update: (delta) => {
-    //game.draw.reset();
-
+    game.camera.update();
     game.hud.update();
-    game.draw.update(delta);
+    game.draw.update(delta, game.camera.rotation);
 
-    //game.draw.chunk(game.chunk.tiles);
-    //game.draw.entities.players(game.entities.getPlayers());
-    //game.draw.entities.player(game.entities.getMainPlayer());
     //game.draw.hud.windows(game.hud.windows);
     //game.draw.hud.cursor(game.draw.canvas.cursor);
   },

@@ -43,11 +43,9 @@ game.draw = {
     this.sprites = sprites;
   },
 
-  update: function(delta) {
+  update: function(delta, rotation) {
     const landContainer = this.landContainer;
     const { piles, billboards } = this.sprites;
-
-    const rotation = landContainer.rotation - 0.003 * delta;
 
     //landContainer.children.sort(
     //(spriteA, spriteB) => spriteA.y - spriteB.y
