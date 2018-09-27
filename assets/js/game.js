@@ -10,9 +10,11 @@ var game = {
       chunk: game.chunk,
       username: phase.username,
     });
-    game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
+    //game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
     game.camera.init();
-    game.draw.init(stage);
+
+    stage.addChild(game.draw.init());
+    //stage.addChild(game.sidebar.init());
 
     this.subscribeActionUpdates(
       game.phase.actions[game.phase.actions.length - 1].id
@@ -29,7 +31,7 @@ var game = {
 
   update: (delta) => {
     game.camera.update();
-    game.hud.update();
+    //game.hud.update();
     game.draw.update(delta, game.camera.rotation);
 
     //game.draw.hud.windows(game.hud.windows);

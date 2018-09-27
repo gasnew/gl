@@ -1,6 +1,7 @@
 game.camera = {
   init: function() {
-    this.targetRotation = -0.145888 / 1.5 * Math.PI / 4;
+    //this.targetRotation = -0.145888 / 1.5 * Math.PI / 4;
+    this.targetRotation = 0;
     this.rotation = this.targetRotation;
 
     this.rotationGroup = new TWEEN.Group();

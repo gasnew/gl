@@ -1,5 +1,17 @@
 //THE START OF MY GAME SO EXCITING
 
+const startGame = (pixi) => {
+  // GET CURRENT PHASE STATE
+  game.Net.State.getPhaseState().then(phaseState => {
+    const phase = Object.create(game.Phase);
+    phase.init({ state: phaseState });
+
+    game.beginPhase(pixi.stage, phase);
+
+    pixi.ticker.add(game.update);
+  });
+};
+
 (() => {
   //Create a Pixi Application
   const pixi = new PIXI.Application({
@@ -15,13 +27,8 @@
   //Add the canvas that Pixi automatically created for you to the HTML document
   document.body.appendChild(pixi.view);
 
-  // GET CURRENT PHASE STATE
-  game.Net.State.getPhaseState().then(phaseState => {
-    const phase = Object.create(game.Phase);
-    phase.init({ state: phaseState });
-
-    game.beginPhase(pixi.stage, phase);
-
-    pixi.ticker.add(game.update);
-  });
+  PIXI.loader
+    .add('font', '../../textures/six_by_five.json')
+    .load((loader, resources) => (game.font = resources.font.spritesheet));
+  PIXI.loader.onComplete.add(() => startGame(pixi));
 })();

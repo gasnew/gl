@@ -2,7 +2,7 @@ game.draw = {
   DRAW_SCALE: 2,
   TILE_SIZE: 16,
 
-  init: function(stage) {
+  init: function() {
     const landContainer = new PIXI.Container();
 
     const chunk = game.phase.index.Chunk[1];
@@ -28,6 +28,7 @@ game.draw = {
         .Fixtures({ fixtures, addChild })
         .concat(game.draw.Players({ players, addChild })),
     };
+    const sprite = game.draw.Text({ text: 'THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG?!?', addChild});
 
     landContainer.height *= this.DRAW_SCALE;
     landContainer.width *= this.DRAW_SCALE;
@@ -36,11 +37,11 @@ game.draw = {
     landContainer.pivot.x = (this.TILE_SIZE * width) / 2;
     landContainer.pivot.y = (this.TILE_SIZE * height) / 2;
 
-    stage.addChild(landContainer);
-
     this.landContainer = landContainer;
     this.filters = filters;
     this.sprites = sprites;
+
+    return landContainer;
   },
 
   update: function(delta, rotation) {
