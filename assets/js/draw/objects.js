@@ -61,25 +61,34 @@ game.draw.Piles = ({ height, width, addChild, addFilter }) => {
   return piles;
 };
 
-game.draw.Fixtures = ({ fixtures, addChild }) => {
+game.draw.Fixtures = ({ fixtureAssets, addChild }) => {
   const texture = PIXI.Texture.fromImage('../../textures/bush.jpg');
 
-  return game.draw.Billboards({ billboards: fixtures, texture, addChild });
+  return game.draw.Billboards({
+    billboardAssets: fixtureAssets,
+    texture,
+    addChild,
+  });
 };
 
-game.draw.Players = ({ players, addChild }) => {
+game.draw.Players = ({ playerAssets, addChild }) => {
   const texture = PIXI.Texture.fromImage('../../textures/man.png');
 
   return game.draw.Billboards({
-    billboards: players,
+    billboardAssets: playerAssets,
     texture,
     addChild,
     xPivot: 16 / 4,
   });
 };
 
-game.draw.Billboards = ({ billboards, texture, addChild, xPivot = 16 / 2 }) => {
-  return billboards.map(billboard => {
+game.draw.Billboards = ({
+  billboardAssets,
+  texture,
+  addChild,
+  xPivot = 16 / 2,
+}) => {
+  return billboardAssets.map(billboard => {
     const sprite = new PIXI.Sprite(texture);
     sprite.x = (billboard.x + 0.5) * 16;
     sprite.y = (billboard.y + 0.5) * 16;
@@ -88,7 +97,10 @@ game.draw.Billboards = ({ billboards, texture, addChild, xPivot = 16 / 2 }) => {
 
     addChild(sprite);
 
-    return sprite;
+    return {
+      sprite,
+      asset: billboard,
+    };
   });
 };
 

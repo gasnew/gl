@@ -10,7 +10,9 @@ var game = {
       chunk: game.chunk,
       username: phase.username,
     });
-    //game.hud.init(game.chunk, game.entities, game.draw.canvas.cursor);
+
+    game.controls.init();
+
     game.camera.init();
 
     stage.addChild(game.sidebar.init());
@@ -32,6 +34,7 @@ var game = {
   update: (delta) => {
     game.camera.update();
     //game.hud.update();
+
     game.sidebar.update();
     game.draw.update(delta, game.camera.rotation);
 

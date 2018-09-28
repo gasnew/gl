@@ -4,7 +4,7 @@ game.entities = {
 
     this.username = username;
     const player = this.getMainPlayer();
-    player.tile = chunk.tileAt(player.y, player.x);
+    player.tile = chunk.tileAt({ row: player.y, col: player.x });
   },
 
   getMainPlayer: function() {

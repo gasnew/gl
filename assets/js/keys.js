@@ -7,6 +7,10 @@ const buildActionBase = actionName => ({
 
 game.keys = {
   bindings: {
+    moveLeft: 'A',
+    moveRight: 'D',
+    moveUp: 'W',
+    moveDown: 'S',
     rotateLeft: 'Q',
     rotateRight: 'E',
   },
@@ -52,7 +56,14 @@ game.keys = {
   dispatch: callbacks => callbacks.forEach(callback => callback()),
 
   thing: () => 5,
-  actions: ['rotateLeft', 'rotateRight'].reduce(
+  actions: [
+    'rotateLeft',
+    'rotateRight',
+    'moveLeft',
+    'moveRight',
+    'moveUp',
+    'moveDown',
+  ].reduce(
     (actions, actionName) => ({
       ...actions,
       [actionName]: buildActionBase(actionName),

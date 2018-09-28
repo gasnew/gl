@@ -6,8 +6,8 @@ game.draw = {
     const landContainer = new PIXI.Container();
 
     const chunk = game.phase.index.Chunk[1];
-    const fixtures = Object.values(game.phase.index.Fixture);
-    const players = Object.values(game.phase.index.Player);
+    const fixtureAssets = Object.values(game.phase.index.Fixture);
+    const playerAssets = Object.values(game.phase.index.Player);
 
     const filters = {
       piles: [0, 1, 2, 3].map(() => new PIXI.filters.ColorMatrixFilter()),
@@ -15,7 +15,7 @@ game.draw = {
 
     const { height, width } = chunk;
     const addChild = sprite => landContainer.addChild(sprite);
-    const sprites = {
+    const objects = {
       land: game.draw.Land({ height, width, addChild }),
       piles: game.draw.Piles({
         height,
@@ -25,8 +25,8 @@ game.draw = {
           (sprite.filters = [filters.piles[edgeNumber]]),
       }),
       billboards: game.draw
-        .Fixtures({ fixtures, addChild })
-        .concat(game.draw.Players({ players, addChild })),
+        .Fixtures({ fixtureAssets, addChild })
+        .concat(game.draw.Players({ playerAssets, addChild })),
     };
 
     landContainer.height *= this.DRAW_SCALE;
@@ -38,14 +38,14 @@ game.draw = {
 
     this.landContainer = landContainer;
     this.filters = filters;
-    this.sprites = sprites;
+    this.objects = objects;
 
     return landContainer;
   },
 
   update: function(delta, rotation) {
     const landContainer = this.landContainer;
-    const { piles, billboards } = this.sprites;
+    const { piles, billboards } = this.objects;
 
     //landContainer.children.sort(
     //(spriteA, spriteB) => spriteA.y - spriteB.y
@@ -81,9 +81,14 @@ game.draw = {
     }
 
     for (const billboard of billboards) {
-      billboard.rotation = -rotation;
+      const { sprite, asset } = billboard;
+      sprite.position.set((asset.x + 0.5) * 16, (asset.y + 0.5) * 16);
+      sprite.rotation = -rotation;
     }
 
     landContainer.rotation = rotation;
+
+    for (const billboard of billboards) {
+    }
   },
 };
