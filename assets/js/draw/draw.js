@@ -28,7 +28,6 @@ game.draw = {
         .Fixtures({ fixtures, addChild })
         .concat(game.draw.Players({ players, addChild })),
     };
-    const sprite = game.draw.Text({ text: 'THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG?!?', addChild});
 
     landContainer.height *= this.DRAW_SCALE;
     landContainer.width *= this.DRAW_SCALE;

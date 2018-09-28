@@ -96,21 +96,17 @@ const specialCharacters = {
   '.': 'period',
   '!': 'exclamation',
   '?': 'question',
-  '[': 'left_bracket',
-  ']': 'right_bracket',
+  '[': 'bracket_left',
+  ']': 'bracket_right',
 };
 const mapCharacterToSpriteName = character => {
-  if (character in specialCharacters)
-    return specialCharacters[character];
-  else if(character === character.toUpperCase())
-    return character;
-  else if( character === character.toLowerCase())
-    return `${character}_lower`;
-  else
-    return 'question';
+  if (character in specialCharacters) return specialCharacters[character];
+  else if (character === character.toUpperCase()) return character;
+  else if (character === character.toLowerCase()) return `${character}_lower`;
+  else return 'question';
 };
 
-game.draw.Text = ({ text, addChild }) => {
+game.draw.Text = ({ text, addChild, addFilter = () => {} }) => {
   const textContainer = new PIXI.Container();
 
   text.split('').forEach(character => {
@@ -122,9 +118,8 @@ game.draw.Text = ({ text, addChild }) => {
     return sprite;
   });
 
+  addFilter(textContainer);
   addChild(textContainer);
 
-  return {
-    container: textContainer,
-  };
+  return textContainer;
 };
