@@ -33,8 +33,7 @@ var game = {
     } catch (error) {
       console.log(`Attempt ${attempts + 1}: Waiting 1 second to retry...`);
       await game.Utils.sleep(1000);
-      if (attempts < 10) this.subscribeActionUpdates(lastActionId, attempts + 1);
-      else console.error('YO! MAX RETRY ATTEMPTS REACHED!');
+      this.subscribeActionUpdates(lastActionId, attempts + 1);
     }
   },
 

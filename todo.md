@@ -25,3 +25,25 @@
 - Attacking (trees and such)
 - Conditioned sheep
   - Action cost
+
+# Features
+- Camera has notion of edge (for rotating controls)
+- ActionAnimationSequencer
+  - Dictates when certain controls can be used
+  - Ensures that actions are shown in the proper order
+
+# Mechanic introductions
+- Start on path, possibly lit one way and uphill that way
+  - Learn to walk
+  - See the moon juice quantity go down and lanterns pass juice down road
+- Encounter bush(es)
+  - Learn to punch
+  - Berries pop off of bush
+  - Eating berries can heal
+- Encounter zombie
+  - Punch zombie
+  - Get more moon juice!!
+  - Learn that punching white things gives you moon juice
+- Encounter home base
+  - Get hooksword (learn about equipping)
+  - See that homebase keeps you safe (but needs to be powered; fixed daily cost?)
