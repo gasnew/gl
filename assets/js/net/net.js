@@ -17,7 +17,8 @@ game.Net = {
             if (this.reqQueue.length > 0) {
               this.reqQueue[0]();
             }
-          });
+          })
+          .catch(() => error => reject(error));
       });
 
       if (this.reqQueue.length === 1) {
@@ -28,10 +29,12 @@ game.Net = {
 
   addRequestNoQueue: function(type, addr, content = {}) {
     return new Promise((resolve, reject) => {
-      this.sendRequest(type, addr, content).then(response => {
-        if (response.success) resolve(response.content);
-        else reject(response.content);
-      });
+      this.sendRequest(type, addr, content)
+        .then(response => {
+          if (response.success) resolve(response.content);
+          else reject(response.content);
+        })
+        .catch(error => reject(error));
     });
   },
 
@@ -70,11 +73,8 @@ game.Net = {
         if (this.status == 200) {
           var response = JSON.parse(this.responseText);
           resolve(response);
-        } else if (this.status == 400) {
-          var response_err = {
-            error: 'BAD REQUESTS ALL OVER',
-          };
-          reject(response_err);
+        } else {
+          reject('Request completed unexpectedly!');
         }
       }
     };

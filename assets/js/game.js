@@ -23,15 +23,22 @@ var game = {
     );
   },
 
-  subscribeActionUpdates: async function(lastActionId) {
-    const response = await game.Net.subscribeActionUpdates(lastActionId);
-    const newActions = response.newActions;
-    for (const action of newActions) game.phase.insertAction(action);
+  subscribeActionUpdates: async function(lastActionId, attempts = 0) {
+    try {
+      const response = await game.Net.subscribeActionUpdates(lastActionId);
+      const newActions = response.newActions;
+      for (const action of newActions) game.phase.insertAction(action);
 
-    this.subscribeActionUpdates(newActions[newActions.length - 1].id);
+      this.subscribeActionUpdates(newActions[newActions.length - 1].id);
+    } catch (error) {
+      console.log(`Attempt ${attempts + 1}: Waiting 1 second to retry...`);
+      await game.Utils.sleep(1000);
+      if (attempts < 10) this.subscribeActionUpdates(lastActionId, attempts + 1);
+      else console.error('YO! MAX RETRY ATTEMPTS REACHED!');
+    }
   },
 
-  update: (delta) => {
+  update: delta => {
     game.camera.update();
     //game.hud.update();
 
