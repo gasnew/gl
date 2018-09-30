@@ -11,9 +11,9 @@ var game = {
       username: phase.username,
     });
 
-    game.controls.init();
-
     game.camera.init();
+
+    game.controls.init();
 
     stage.addChild(game.sidebar.init());
     stage.addChild(game.draw.init());

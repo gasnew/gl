@@ -1,27 +1,30 @@
 game.camera = {
   init: function() {
-    //this.targetRotation = -0.145888 / 1.5 * Math.PI / 4;
     this.targetRotation = 0;
+    this.targetEdge = 0;
     this.rotation = this.targetRotation;
 
     this.rotationGroup = new TWEEN.Group();
+  },
 
-    game.keys.actions.rotateLeft.subscribe(() => {
-      this.rotationGroup.removeAll();
-      this.targetRotation -= Math.PI / 2;
-      new TWEEN.Tween(this, this.rotationGroup)
-        .to({ rotation: this.targetRotation })
-        .easing(TWEEN.Easing.Quintic.Out)
-        .start();
-    });
-    game.keys.actions.rotateRight.subscribe(() => {
-      this.rotationGroup.removeAll();
-      this.targetRotation += Math.PI / 2;
-      new TWEEN.Tween(this, this.rotationGroup)
-        .to({ rotation: this.targetRotation })
-        .easing(TWEEN.Easing.Quintic.Out)
-        .start();
-    });
+  rotateLeft: function() {
+    this.targetEdge = (this.targetEdge + 3) % 4;
+    this.targetRotation -= Math.PI / 2;
+    this.rotationGroup.removeAll();
+    new TWEEN.Tween(this, this.rotationGroup)
+      .to({ rotation: this.targetRotation })
+      .easing(TWEEN.Easing.Quintic.Out)
+      .start();
+  },
+
+  rotateRight: function() {
+    this.targetEdge = (this.targetEdge + 1) % 4;
+    this.targetRotation += Math.PI / 2;
+    this.rotationGroup.removeAll();
+    new TWEEN.Tween(this, this.rotationGroup)
+      .to({ rotation: this.targetRotation })
+      .easing(TWEEN.Easing.Quintic.Out)
+      .start();
   },
 
   update: function() {

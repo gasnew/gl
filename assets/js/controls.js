@@ -2,14 +2,29 @@ game.controls = {
   init: function() {
     const player = game.entities.getMainPlayer();
     const directions = {
-      moveLeft: () => ({ row: player.y, col: player.x - 1 }),
-      moveRight: () => ({ row: player.y, col: player.x + 1 }),
-      moveUp: () => ({ row: player.y - 1, col: player.x }),
-      moveDown: () => ({ row: player.y + 1, col: player.x }),
+      moveLeft: () =>
+        game.controls.getPositionByCameraRotation(player, -Math.PI / 2),
+      moveRight: () =>
+        game.controls.getPositionByCameraRotation(player, Math.PI / 2),
+      moveUp: () => game.controls.getPositionByCameraRotation(player, Math.PI),
+      moveDown: () => game.controls.getPositionByCameraRotation(player, 0),
     };
     for (const direction of Object.keys(directions)) {
-      game.keys.actions[direction].subscribe(() => player.moveTo(
-        game.chunk.tileAt(directions[direction]())));
+      game.keys.actions[direction].subscribe(() =>
+        player.moveTo(game.chunk.tileAt(directions[direction]()))
+      );
     }
+
+    game.keys.actions.rotateLeft.subscribe(() => game.camera.rotateLeft());
+    game.keys.actions.rotateRight.subscribe(() => game.camera.rotateRight());
+  },
+
+  getPositionByCameraRotation: function(entity, rotation) {
+    return {
+      row:
+        entity.y + Math.cos((game.camera.targetEdge * Math.PI) / 2 + rotation),
+      col:
+        entity.x + Math.sin((game.camera.targetEdge * Math.PI) / 2 + rotation),
+    };
   },
 };
