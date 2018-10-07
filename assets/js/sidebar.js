@@ -6,15 +6,17 @@ game.sidebar = {
     const addChild = sprite => controlsContainer.addChild(sprite);
     const addFilter = sprite => (sprite.filters = [whiteFilter]);
     const objects = {
-      bindings: Object.keys(game.keys.bindings).map(actionName =>
-        game.sidebar.Binding({
+      bindings: Object.keys(game.keys.bindings).map(actionName => {
+        const binding = game.sidebar.Binding({
           actionName,
           key: game.keys.bindings[actionName],
           y: controlsContainer.height + (controlsContainer.height ? 4 : 0),
           addChild,
           addFilter,
-        })
-      ),
+        });
+        game.keys.actions[actionName].subscribe('onDown', binding.onDown);
+        game.keys.actions[actionName].subscribe('onUp', binding.onUp);
+      }),
     };
 
     whiteFilter.negative();
@@ -25,15 +27,6 @@ game.sidebar = {
     this.objects = objects;
 
     return controlsContainer;
-  },
-
-  update: function() {
-    for (const binding of this.objects.bindings) {
-      if (game.keys.actions[binding.actionName].isDown)
-        binding.onDown();
-      else
-        binding.onUp();
-    }
   },
 };
 

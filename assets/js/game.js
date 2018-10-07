@@ -39,9 +39,7 @@ var game = {
 
   update: delta => {
     game.camera.update();
-    //game.hud.update();
 
-    game.sidebar.update();
     game.draw.update(delta, game.camera.rotation);
 
     //game.draw.hud.windows(game.hud.windows);

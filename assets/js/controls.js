@@ -10,13 +10,17 @@ game.controls = {
       moveDown: () => game.controls.getPositionByCameraRotation(player, 0),
     };
     for (const direction of Object.keys(directions)) {
-      game.keys.actions[direction].subscribe(() =>
+      game.keys.actions[direction].subscribe('onDown', () =>
         player.moveTo(game.chunk.tileAt(directions[direction]()))
       );
     }
 
-    game.keys.actions.rotateLeft.subscribe(() => game.camera.rotateLeft());
-    game.keys.actions.rotateRight.subscribe(() => game.camera.rotateRight());
+    game.keys.actions.rotateLeft.subscribe('onDown', () =>
+      game.camera.rotateLeft()
+    );
+    game.keys.actions.rotateRight.subscribe('onDown', () =>
+      game.camera.rotateRight()
+    );
   },
 
   getPositionByCameraRotation: function(entity, rotation) {

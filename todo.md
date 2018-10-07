@@ -27,10 +27,13 @@
   - Action cost
 
 # Features
-- Camera has notion of edge (for rotating controls)
 - ActionAnimationSequencer
   - Dictates when certain controls can be used
   - Ensures that actions are shown in the proper order
+- Hold Q to backpack
+  - Things get packed in there lol
+  - Like throw them out to drop them on the ground lol
+  - Lol, like little tooltips tell you what action you're about to perform, haha
 
 # Mechanic introductions
 - Start on path, possibly lit one way and uphill that way

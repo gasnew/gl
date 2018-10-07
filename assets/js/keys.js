@@ -1,7 +1,14 @@
-const buildActionBase = actionName => ({
+const buildEventBase = (actionName, eventName) => ({
   callbacks: [],
-  subscribe: callback => game.keys.actions[actionName].callbacks.push(callback),
-  onDown: () => game.keys.dispatch(game.keys.actions[actionName].callbacks),
+  call: () =>
+    game.keys.dispatch(game.keys.actions[actionName][eventName].callbacks),
+});
+
+const buildActionBase = actionName => ({
+  subscribe: (eventName, callback) =>
+    game.keys.actions[actionName][eventName].callbacks.push(callback),
+  onDown: buildEventBase(actionName, 'onDown'),
+  onUp: buildEventBase(actionName, 'onUp'),
   isDown: false,
 });
 
@@ -35,7 +42,7 @@ game.keys = {
       const action = game.keys.actions[actionName];
       if (!action.isDown) {
         action.isDown = true;
-        action.onDown();
+        action.onDown.call();
       }
     });
   },
@@ -44,6 +51,7 @@ game.keys = {
     game.keys.mapCodeToActionNames(event.keyCode).forEach(actionName => {
       const action = game.keys.actions[actionName];
       action.isDown = false;
+      action.onUp.call();
     });
   },
 
