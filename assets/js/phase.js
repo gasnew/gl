@@ -110,6 +110,10 @@ game.Phase = {
   applyAction: function(action) {
     if (action.type === 'createUser') {
       this.digestAndMergeIntoIndex(action.newRecords);
+      game.draw.queueAdd({
+        modelName: 'Player',
+        asset: this.index.Player[action.PlayerId],
+      });
     } else if (action.type === 'move') {
       const tile = action.content.toTile;
       const player = this.index.Player[action.PlayerId];

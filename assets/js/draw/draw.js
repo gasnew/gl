@@ -2,52 +2,67 @@ game.draw = {
   DRAW_SCALE: 2,
   TILE_SIZE: 16,
 
+  ModelToObjectsMap: {
+    Tile: 'tiles',
+    Facade: 'facades',
+    Fixture: 'billboards',
+    Player: 'billboards',
+  },
+
+  addParamsQueue: [], // A queue of parameters for adding new DisplayObjects
+
   init: function() {
     const landContainer = new PIXI.Container();
 
     const chunk = game.phase.index.Chunk[1];
     const fixtureAssets = Object.values(game.phase.index.Fixture);
-    const playerAssets = Object.values(game.phase.index.Player);
 
     const filters = {
       facades: [0, 1, 2, 3].map(() => new PIXI.filters.ColorMatrixFilter()),
     };
 
     this.landContainer = landContainer;
+    this.objects = Object.values(this.ModelToObjectsMap).reduce(
+      (objects, object) => ({
+        ...objects,
+        [object]: [],
+      }),
+      {}
+    );
 
     const { height, width } = chunk;
-    const objects = {
-      tiles: chunk.tiles
-        .map(row => row.map(asset => this.add({ modelName: 'Tile', asset })))
-        .flat(),
-      facades: chunk.tiles
-        .map(row =>
-          row.map(asset =>
-            [0, 1, 2, 3].map(edgeNumber =>
-              this.add({
-                modelName: 'Facade',
-                asset,
-                extraOptions: {
+
+    // Add Tiles
+    chunk.tiles
+      .map(row => row.map(asset => this.add({ modelName: 'Tile', asset })))
+      .flat();
+
+    // Add Facades
+    chunk.tiles
+      .map(row =>
+        row.map(asset =>
+          [0, 1, 2, 3].map(edgeNumber =>
+            this.add({
+              modelName: 'Facade',
+              asset,
+              extraOptions: {
+                edgeNumber,
+                filter: filters.facades[edgeNumber],
+                isExposed: game.draw.Facade.isExposed({
+                  asset,
                   edgeNumber,
-                  filter: filters.facades[edgeNumber],
-                  isExposed: game.draw.Facade.isExposed({
-                    asset,
-                    edgeNumber,
-                    height,
-                    width,
-                  }),
-                },
-              })
-            )
+                  height,
+                  width,
+                }),
+              },
+            })
           )
         )
-        .flat(2),
-      billboards: fixtureAssets
-        .map(asset => this.add({ modelName: 'Fixture', asset }))
-        .concat(
-          playerAssets.map(asset => this.add({ modelName: 'Player', asset }))
-        ),
-    };
+      )
+      .flat(2);
+
+    // Add Fixtures
+    fixtureAssets.map(asset => this.add({ modelName: 'Fixture', asset }));
 
     landContainer.height *= this.DRAW_SCALE;
     landContainer.width *= this.DRAW_SCALE;
@@ -57,7 +72,6 @@ game.draw = {
     landContainer.pivot.y = (this.TILE_SIZE * height) / 2;
 
     this.filters = filters;
-    this.objects = objects;
 
     return landContainer;
   },
@@ -72,15 +86,25 @@ game.draw = {
 
     container.addChild(displayObject);
 
-    return {
+    const object = {
       displayObject,
       asset,
       extraOptions,
       container,
     };
+    this.objects[this.ModelToObjectsMap[modelName]].push(object);
+
+    return object;
+  },
+
+  queueAdd: function(addParams) {
+    this.addParamsQueue.push(addParams);
   },
 
   update: function(delta, rotation) {
+    this.addParamsQueue.forEach(addParams => this.add(addParams));
+    this.addParamsQueue.length = 0;
+
     const landContainer = this.landContainer;
     const { facades, billboards } = this.objects;
 
