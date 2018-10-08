@@ -117,7 +117,7 @@ game.Phase = {
       player.x = tile.x;
       player.y = tile.y;
       player.tile = tile;
-      console.log('action', action.id, 'move to', tile.x, tile.y);
+      //console.log('action', action.id, 'move to', tile.x, tile.y);
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
@@ -137,7 +137,7 @@ game.Phase = {
       player.x = tile.x;
       player.y = tile.y;
       player.tile = tile;
-      console.log('undo action', action.id, 'move to', tile.x, tile.y);
+      //console.log('undo action', action.id, 'move to', tile.x, tile.y);
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
