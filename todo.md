@@ -1,7 +1,7 @@
 # Roadmap
 + Basic movement
 + Corgi cube
-/ Fixtures
++ Fixtures
   + Controls in sidebar
   + Player movement
   + Tie sprites closer to data (can add and remove in game.draw)
