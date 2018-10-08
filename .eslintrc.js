@@ -33,6 +33,7 @@ module.exports = {
     },
     "globals": {
         "game": false,
-        "PIXI": false
+        "PIXI": false,
+        "TWEEN": false
     }
 };

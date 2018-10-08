@@ -14,6 +14,7 @@ module.exports = function(sequelize, DataTypes) {
 
   Chunk.associate = function(models) {
     Chunk.hasMany(models.Item);
+    Chunk.hasMany(models.Fixture);
   };
 
   return Chunk;

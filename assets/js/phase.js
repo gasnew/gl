@@ -110,6 +110,10 @@ game.Phase = {
   applyAction: function(action) {
     if (action.type === 'createUser') {
       this.digestAndMergeIntoIndex(action.newRecords);
+      game.draw.queueAdd({
+        modelName: 'Player',
+        asset: this.index.Player[action.PlayerId],
+      });
     } else if (action.type === 'move') {
       const tile = action.content.toTile;
       const player = this.index.Player[action.PlayerId];
@@ -117,7 +121,7 @@ game.Phase = {
       player.x = tile.x;
       player.y = tile.y;
       player.tile = tile;
-      console.log('action', action.id, 'move to', tile.x, tile.y);
+      //console.log('action', action.id, 'move to', tile.x, tile.y);
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;
@@ -137,7 +141,7 @@ game.Phase = {
       player.x = tile.x;
       player.y = tile.y;
       player.tile = tile;
-      console.log('undo action', action.id, 'move to', tile.x, tile.y);
+      //console.log('undo action', action.id, 'move to', tile.x, tile.y);
     } else if (action.type === 'transfer') {
       var from = action.content.fromContainer;
       var to = action.content.toContainer;

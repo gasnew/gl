@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  var Item = sequelize.define('Item', {
+  var Fixture = sequelize.define('Fixture', {
     type: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -14,11 +14,10 @@ module.exports = function(sequelize, DataTypes) {
     },
   });
 
-  Item.associate = function(models) {
-    Item.belongsTo(models.Chunk);
-    Item.belongsTo(models.Inventory);
+  Fixture.associate = function(models) {
+    Fixture.belongsTo(models.Chunk);
   };
 
-  return Item;
+  return Fixture;
 };
 
