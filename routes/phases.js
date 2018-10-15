@@ -70,6 +70,7 @@ router.post('/new-action', async function(req, res) {
       success: true,
       content: {
         actionId: action.id,
+        newRecords: action.newRecords,
       },
     });
 

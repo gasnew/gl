@@ -11,7 +11,7 @@
   + Sprites also update with object attributes (coordinates)
 - Punch mode
   - Hold F to activate
-  - Punchable blocks highlighted
+  - Punchable tiles highlighted
   - Can punch a bush to make berries drop
 - Inventory for players
   - Action tooltip ('Punch' and 'Pick up')

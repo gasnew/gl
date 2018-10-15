@@ -1,10 +1,10 @@
 game.Net = {
   reqQueue: [],
 
-  addRequest: function(type, addr, content = {}) {
+  addRequest: function({ type, addr, createPayload }) {
     return new Promise((resolve, reject) => {
       this.reqQueue.push(() => {
-        this.sendRequest(type, addr, content)
+        this.sendRequest(type, addr, createPayload)
           .then(response => {
             if (response.success) resolve(response.content);
             else {
@@ -27,9 +27,9 @@ game.Net = {
     });
   },
 
-  addRequestNoQueue: function(type, addr, content = {}) {
+  addRequestNoQueue: function({ type, addr, createPayload }) {
     return new Promise((resolve, reject) => {
-      this.sendRequest(type, addr, content)
+      this.sendRequest(type, addr, createPayload)
         .then(response => {
           if (response.success) resolve(response.content);
           else reject(response.content);
@@ -38,7 +38,7 @@ game.Net = {
     });
   },
 
-  sendRequest: function(type, addr, content) {
+  sendRequest: function(type, addr, createPayload) {
     return new Promise((resolve, reject) => {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = this.buildRequestResponse(resolve, reject);
@@ -46,7 +46,7 @@ game.Net = {
 
       if (type == 'POST') {
         xhttp.setRequestHeader('Content-Type', 'application/json');
-        xhttp.send(JSON.stringify(content));
+        xhttp.send(JSON.stringify(createPayload()));
       } else {
         xhttp.send();
       }
@@ -57,14 +57,19 @@ game.Net = {
     this.reqQueue.length = 0;
   },
 
-  post: function(addr, content, { noQueue = false } = {}) {
-    if (noQueue) return this.addRequestNoQueue('POST', addr, content);
-    else return this.addRequest('POST', addr, content);
+  post: function({ addr, createPayload, noQueue = false }) {
+    if (noQueue)
+      return this.addRequestNoQueue({
+        type: 'POST',
+        addr,
+        createPayload,
+      });
+    else return this.addRequest({ type: 'POST', addr, createPayload });
   },
 
   get: function(addr, noQueue = false) {
-    if (noQueue) return this.addRequestNoQueue('GET', addr);
-    else return this.addRequest('GET', addr);
+    if (noQueue) return this.addRequestNoQueue({ type: 'GET', addr });
+    else return this.addRequest({ type: 'GET', addr });
   },
 
   buildRequestResponse: function(resolve, reject) {
@@ -80,15 +85,18 @@ game.Net = {
     };
   },
 
-  postAction: function(actionRequest) {
-    return this.post('phases/new-action', actionRequest);
+  postAction: function(action) {
+    return this.post({
+      addr: 'phases/new-action',
+      createPayload: () => action.createPayload(),
+    });
   },
 
   subscribeActionUpdates: function(latestActionId) {
-    return this.post(
-      'phases/subscribe-action-updates',
-      { latestActionId },
-      { noQueue: true }
-    );
+    return this.post({
+      addr: 'phases/subscribe-action-updates',
+      createPayload: () => ({ latestActionId }),
+      noQueue: true,
+    });
   },
 };

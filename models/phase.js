@@ -42,7 +42,7 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     Phase.prototype.performAction = async function(action, transaction) {
-      if (action.type == 'createUser') {
+      if (action.type === 'createUser') {
         const userInfo = action.content;
         const user = await models.User.create(userInfo, {
           transaction,
@@ -64,14 +64,17 @@ module.exports = function(sequelize, DataTypes) {
           { transaction }
         );
 
-        action.newRecords = {
-          User: { [user.id]: user },
-          Player: { [player.id]: player },
-          Inventory: { [inventory.id]: inventory },
-          Item: { [item.id]: item },
-        };
+        action.newRecords = [
+          { modelName: 'User', data: user },
+          { modelName: 'Player', data: player },
+          { modelName: 'Inventory', data: inventory },
+          { modelName: 'Item', data: item },
+        ];
+
         await action.save({ transaction });
-      } else if (action.type == 'move') {
+      } else if (action.type === 'attack') {
+        const player = await action.getPlayer({ transaction });
+      } else if (action.type === 'move') {
         const player = await action.getPlayer({ transaction });
         const toTile = action.content.toTile;
         const dist = math.tilesTo(player, toTile);
@@ -80,7 +83,7 @@ module.exports = function(sequelize, DataTypes) {
         player.x = toTile.x;
         player.y = toTile.y;
         await player.save({ transaction });
-      } else if (action.type == 'transfer') {
+      } else if (action.type === 'transfer') {
         console.log(action.content.fromContainer);
         var item = await models.Item.find({
           where: { id: action.content.item.id },

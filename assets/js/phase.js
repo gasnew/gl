@@ -57,22 +57,19 @@ game.Phase = {
     return connectedIndex;
   },
 
-  digestAndMergeIntoIndex: function(recordIndex) {
-    for (const modelName of Object.keys(recordIndex)) {
-      const records = recordIndex[modelName];
-      for (const id of Object.keys(records)) {
-        this.index[modelName][id] = game.Utils.create(modelName, records[id]);
-      }
+  digestAndMergeIntoIndex: function(newRecords) {
+    for (const recordInfo of newRecords) {
+      console.log(recordInfo);
+      const { modelName, data } = recordInfo;
+      this.index[modelName][data.id] = game.Utils.create(modelName, data);
     }
-    for (const modelName of Object.keys(recordIndex)) {
-      const records = recordIndex[modelName];
-      for (const id of Object.keys(records)) {
-        const asset = this.index[modelName][id];
-        this.index[modelName][id] = this.connect(
-          this.index,
-          asset
-        );
-      }
+    for (const recordInfo of newRecords) {
+      const { modelName, data } = recordInfo;
+      const asset = this.index[modelName][data.id];
+      this.index[modelName][data.id] = this.connect(
+        this.index,
+        asset
+      );
     }
   },
 
@@ -185,6 +182,7 @@ game.Phase = {
       var response = await game.Net.postAction(action);
       console.log('got action id', response.actionId);
       action.id = response.actionId;
+      this.assignRecordIds(action.recordsToCreate, response.newRecords);
       this.insertAction(action, { removeFromPending: true });
       console.log(action);
       console.log(this.actions);
@@ -193,6 +191,15 @@ game.Phase = {
       console.error(error);
       this.rewindPendingActions();
       this.pendingActions.length = 0;
+    }
+  },
+
+  assignRecordIds: function(recordsToCreate, newRecords) {
+    if (!recordsToCreate) return;
+    for (let i = 0; i < recordsToCreate.length; i++) {
+      const asset = recordsToCreate[i];
+      const record = newRecords[i];
+      asset.id = record.id;
     }
   },
 

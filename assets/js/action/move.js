@@ -9,4 +9,8 @@ Object.assign(game.Action.MoveRequest, {
       toTile: toTile,
     };
   },
+
+  createPayload: function() {
+    return this;
+  }
 });
